@@ -1,4 +1,4 @@
-image: debian:buster-slim
+image: debian:bullseye
 
 stages:
   - build
@@ -57,7 +57,7 @@ check:
     - volatile
   <<: *apt
   script:
-    - apt-get install -y -qq sparse clang-tidy-7
+    - apt-get install -y -qq sparse clang-tidy-11
     - make check
 
 test:

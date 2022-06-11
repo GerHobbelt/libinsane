@@ -13,7 +13,7 @@ Don't hesitate to add tests.
 
 ```
 apt install \
-    clang-tidy-7 \
+    clang-tidy-11 \
     valgrind \
     libcunit1-ncurses-dev
 ```
