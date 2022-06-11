@@ -128,6 +128,16 @@ static const struct {
 		.enabled_by_default = 1,
 	},
 	{
+		.name = "workaround_hide_source_auto",
+		.env = "LIBINSANE_WORKAROUND_HIDE_SOURCE_AUTO",
+		.wrap_cb = lis_api_workaround_hide_source_auto,
+#ifdef OS_WINDOWS
+		.enabled_by_default = 0,
+#else
+		.enabled_by_default = 1,
+#endif
+	},
+	{
 		.name = "normalizer_source_types",
 		.env = "LIBINSANE_NORMALIZER_SOURCE_TYPES",
 		.wrap_cb = lis_api_normalizer_source_types,
