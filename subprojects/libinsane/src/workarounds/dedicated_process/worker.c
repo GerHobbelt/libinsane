@@ -767,8 +767,8 @@ void lis_worker_main(struct lis_api *to_wrap, struct lis_pipes *pipes)
 #endif
 
 #ifndef DISABLE_REDIRECT_STDERR
-	if (dup2(pipes->sorted.stderr[1], STDOUT_FILENO) < 0
-		|| dup2(pipes->sorted.stderr[1], STDERR_FILENO) < 0) {
+	if (dup2(pipes->sorted.std_err[1], STDOUT_FILENO) < 0
+		|| dup2(pipes->sorted.std_err[1], STDERR_FILENO) < 0) {
 		lis_log_warning(
 			"Failed to redirect stderr and stdout: %d, %s", errno, strerror(errno)
 		);
