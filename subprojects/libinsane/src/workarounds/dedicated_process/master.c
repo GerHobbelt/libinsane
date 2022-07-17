@@ -183,7 +183,7 @@ static void *log_thread(void *_pipes)
 	);
 	lis_log_debug(
 		"Stderr pipe: Read: %d - Write: %d",
-		pipes->sorted.stderr[0], pipes->sorted.stderr[1]
+		pipes->sorted.std_err[0], pipes->sorted.std_err[1]
 	);
 
 	lis_log_info("Log thread started");
@@ -1158,8 +1158,8 @@ enum lis_error lis_api_workaround_dedicated_process(
 		private->pipes.sorted.msgs_w2m[0] = -1;
 		close(private->pipes.sorted.logs[0]);
 		private->pipes.sorted.logs[0] = -1;
-		close(private->pipes.sorted.stderr[0]);
-		private->pipes.sorted.stderr[0] = -1;
+		close(private->pipes.sorted.std_err[0]);
+		private->pipes.sorted.std_err[0] = -1;
 
 		lis_worker_main(to_wrap, &private->pipes);
 		abort(); // lis_worker_main() must never return
@@ -1172,8 +1172,8 @@ enum lis_error lis_api_workaround_dedicated_process(
 	private->pipes.sorted.msgs_w2m[1] = -1;
 	close(private->pipes.sorted.logs[1]);
 	private->pipes.sorted.logs[1] = -1;
-	close(private->pipes.sorted.stderr[1]);
-	private->pipes.sorted.stderr[1] = -1;
+	close(private->pipes.sorted.std_err[1]);
+	private->pipes.sorted.std_err[1] = -1;
 
 	lis_log_info("Child process PID: %u", (int)private->worker);
 

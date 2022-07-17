@@ -1,5 +1,7 @@
 #include <errno.h>
+#ifdef __GLIBC__
 #include <execinfo.h>
+#endif
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -144,8 +146,10 @@ static void worker_log_callback(enum lis_log_level lvl, const char *msg)
 #ifndef DISABLE_CRASH_HANDLER
 static void crash_handler(int sig) {
 	pid_t mypid;
+#ifdef __GLIBC__
 	void *stack[16];
 	size_t size;
+#endif
 	unsigned int i;
 
 	mypid = getpid();
@@ -165,6 +169,7 @@ static void crash_handler(int sig) {
 		);
 	}
 
+#ifdef __GLIBC__
 	fprintf(stderr, "======== START OF BACKTRACE ========\n");
 
 	// get void*'s for all entries on the stack
@@ -175,6 +180,7 @@ static void crash_handler(int sig) {
 
 	fsync(STDERR_FILENO);
 	fprintf(stderr, "======== END OF BACKTRACE ========\n");
+#endif
 
 	if (kill(mypid, sig) < 0) {
 		fprintf(stderr, "KILL FAILED\n");
@@ -761,8 +767,8 @@ void lis_worker_main(struct lis_api *to_wrap, struct lis_pipes *pipes)
 #endif
 
 #ifndef DISABLE_REDIRECT_STDERR
-	if (dup2(pipes->sorted.stderr[1], STDOUT_FILENO) < 0
-		|| dup2(pipes->sorted.stderr[1], STDERR_FILENO) < 0) {
+	if (dup2(pipes->sorted.std_err[1], STDOUT_FILENO) < 0
+		|| dup2(pipes->sorted.std_err[1], STDERR_FILENO) < 0) {
 		lis_log_warning(
 			"Failed to redirect stderr and stdout: %d, %s", errno, strerror(errno)
 		);

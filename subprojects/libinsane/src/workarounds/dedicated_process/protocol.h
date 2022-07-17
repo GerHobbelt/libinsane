@@ -61,7 +61,7 @@ struct lis_pipes
 			int msgs_m2w[2]; /* messages ; query (master -> worker) */
 			int msgs_w2m[2]; /* messages ; reply (worker -> master) */
 			int logs[2]; /* worker to master only ; prefixed by log level + msg len */
-			int stderr[2]; /* worker to master only */
+			int std_err[2]; /* worker to master only */
 		} sorted;
 		int all[4][2];
 	};
@@ -72,7 +72,7 @@ struct lis_pipes
 		char buf[1024]; // to avoid a malloc() on each stderr line
 		ssize_t current;
 		ssize_t total;
-	} stderr;
+	} std_err;
 };
 
 
