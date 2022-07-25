@@ -50,7 +50,7 @@ CI builds everything with:
 
 - Debian GNU/Linux stable.
 - Linux version: GCC (32 and 64bits builds).
-- Windows version: Mingw32 (32bits build only).
+- Windows version: Mingw64 (64bits build only).
 - `-Wall -Werror` (see `make` / `make build`).
 
 Therefore:
