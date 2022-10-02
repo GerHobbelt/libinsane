@@ -26,6 +26,7 @@ LIBINSANE_VALGRIND_TESTS = [
     'workaround_check_capabilities',
     'workaround_dedicated_thread',
     'workaround_hide_source_auto',
+    'workaround_invalid_page_size',
     'workaround_lamp',
     'workaround_one_page_flatbed',
     'workaround_opt_names',

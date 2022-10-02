@@ -36,8 +36,6 @@ struct lis_dumb_item {
 struct lis_dumb_scan_session {
 	struct lis_scan_session parent;
 	struct lis_dumb_private *impl;
-	int read_idx;
-	int read_offset;
 };
 #define LIS_DUMB_SCAN_SESSION(scan_session) ((struct lis_dumb_scan_session *)(scan_session));
 
@@ -59,6 +57,8 @@ struct lis_dumb_private {
 	struct {
 		const struct lis_dumb_read *read_contents;
 		int nb_reads;
+		int read_idx;
+		int read_offset;
 		int is_scanning;
 		struct lis_dumb_scan_session *session;
 	} scan;
@@ -305,8 +305,10 @@ static enum lis_error dumb_get_scan_parameters(
 	)
 {
 	struct lis_dumb_scan_session *private = LIS_DUMB_SCAN_SESSION(self);
-	memcpy(parameters, &private->impl->scan_parameters,
-		sizeof(*parameters));
+	memcpy(
+		parameters, &private->impl->scan_parameters,
+		sizeof(*parameters)
+	);
 	return LIS_OK;
 }
 
@@ -456,6 +458,8 @@ void lis_dumb_set_scan_result(struct lis_api *self, const struct lis_dumb_read *
 	struct lis_dumb_private *private = LIS_DUMB_PRIVATE(self);
 	private->scan.read_contents = read_contents;
 	private->scan.nb_reads = nb_reads;
+	private->scan.read_idx = 0;
+	private->scan.read_offset = 0;
 }
 
 
@@ -464,7 +468,7 @@ static int dumb_end_of_feed(struct lis_scan_session *session)
 	int r;
 	struct lis_dumb_scan_session *private = LIS_DUMB_SCAN_SESSION(session);
 
-	r = (private->read_idx >= private->impl->scan.nb_reads);
+	r = (private->impl->scan.read_idx >= private->impl->scan.nb_reads);
 	if (r) {
 		private->impl->scan.is_scanning = 0;
 	}
@@ -476,18 +480,18 @@ static int dumb_end_of_page(struct lis_scan_session *session)
 {
 	struct lis_dumb_scan_session *private = LIS_DUMB_SCAN_SESSION(session);
 
-	if (private->read_idx >= private->impl->scan.nb_reads) {
+	if (private->impl->scan.read_idx >= private->impl->scan.nb_reads) {
 		return 1;
 	}
 
-	if (private->impl->scan.read_contents[private->read_idx].nb_bytes == 0) {
+	if (private->impl->scan.read_contents[private->impl->scan.read_idx].nb_bytes == 0) {
 		return 1;
 	}
 
 	if (dumb_end_of_feed(session)) {
 		return 1;
 	}
-	return private->impl->scan.read_contents[private->read_idx].nb_bytes <= 0;
+	return private->impl->scan.read_contents[private->impl->scan.read_idx].nb_bytes <= 0;
 }
 
 
@@ -498,25 +502,29 @@ static enum lis_error dumb_scan_read(
 	size_t max_read;
 	struct lis_dumb_scan_session *private = LIS_DUMB_SCAN_SESSION(session);
 
-	while(private->impl->scan.read_contents[private->read_idx].nb_bytes == 0) {
-		private->read_idx++;
+	while(private->impl->scan.read_contents[private->impl->scan.read_idx].nb_bytes == 0) {
+		private->impl->scan.read_idx++;
 	}
 
-	max_read = private->impl->scan.read_contents[private->read_idx].nb_bytes - private->read_offset;
+	max_read = (
+		private->impl->scan.read_contents[private->impl->scan.read_idx].nb_bytes
+		- private->impl->scan.read_offset
+	);
 
 	*buffer_size = MIN(*buffer_size, max_read);
 	assert(*buffer_size > 0);
 
 	memcpy(
 		out_buffer,
-		private->impl->scan.read_contents[private->read_idx].content + private->read_offset,
+		private->impl->scan.read_contents[private->impl->scan.read_idx].content
+		+ private->impl->scan.read_offset,
 		*buffer_size
 	);
 
 	if (*buffer_size >= max_read) {
-		private->read_idx++;
+		private->impl->scan.read_idx++;
 	} else {
-		private->read_offset += *buffer_size;
+		private->impl->scan.read_offset += *buffer_size;
 	}
 	return LIS_OK;
 }
@@ -529,8 +537,8 @@ static void dumb_cancel(struct lis_scan_session *session)
 
 	impl = private->impl;
 
-	private->read_idx = 0xFFFFFFFF;
-	private->read_offset = 0xFFFFFFFF;
+	private->impl->scan.read_idx = 0xFFFFFFFF;
+	private->impl->scan.read_offset = 0xFFFFFFFF;
 	FREE(impl->scan.session);
 	impl->scan.is_scanning = 0;
 }
