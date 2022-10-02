@@ -803,13 +803,14 @@ static int lis_sane_check_opt_descriptor(const char *item_name, int opt_idx,
 
 failed:
 	lis_log_warning(
-		"Device [%s]: Invalid or unsupported option descriptor [%s](%d ; [%s] ; [%s])."
+		"Device [%s]: Invalid or unsupported option descriptor [%s](%d ; [%s] ; [%s] ; [%d])."
 		" Ignored",
 		item_name,
 		sane_desc->name != NULL ? sane_desc->name : "(null)",
 		opt_idx,
 		sane_desc->title != NULL ? sane_desc->title : "(null)",
-		sane_desc->desc != NULL ? sane_desc->desc : "(null)"
+		sane_desc->desc != NULL ? sane_desc->desc : "(null)",
+		sane_desc->type
 	);
 	return 0;
 }
