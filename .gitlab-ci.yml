@@ -52,9 +52,6 @@ check:
   only:
     - branches@World/OpenPaperwork/libinsane
     - tags@World/OpenPaperwork/libinsane
-  tags:
-    - linux
-    - volatile
   <<: *apt
   script:
     - apt-get install -y -qq sparse clang-tidy-11
@@ -65,9 +62,6 @@ test:
   only:
     - branches@World/OpenPaperwork/libinsane
     - tags@World/OpenPaperwork/libinsane
-  tags:
-    - linux
-    - volatile
   <<: *apt
   script:
     - make test
@@ -78,9 +72,6 @@ doc:
   only:
     - branches@World/OpenPaperwork/libinsane
     - tags@World/OpenPaperwork/libinsane
-  tags:
-    - linux
-    - volatile
   <<: *apt
   script:
     - apt-get install -y -qq rclone
