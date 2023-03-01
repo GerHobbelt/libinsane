@@ -76,7 +76,7 @@ static void tests_sane_get_device_ko(void)
 	struct lis_item *item = NULL;
 
 	err = g_sane->get_device(g_sane, "non-existing", &item);
-	LIS_ASSERT_EQUAL(err, LIS_ERR_INVALID_VALUE);
+	LIS_ASSERT_EQUAL(err, LIS_ERR_OFFLINE);
 	LIS_ASSERT_EQUAL(item, NULL);
 }
 
