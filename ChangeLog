@@ -1,3 +1,19 @@
+2023/03/01 - 1.0.10:
+- New error code: LIS_ERR_OFFLINE: returned when attempting to use the scanner
+  and the scanner is offline.
+- normalizers/raw24: fix unpacking of 1bit images.
+- New workaround for Sane: 'hide_source_auto':
+  remove sources 'Auto'|'Automatic':
+  those source behavior depends on the scanner and cannot be used reliably.
+- New workaround for Sane + Brother scanners: 'invalid_page_size':
+  some Brother scanners/drivers report there is still a page in the feeder,
+  but when requesting the page, we get an absurd size (2500x0 for example).
+- dedicated process: do not try to log messages through the log socket if one of the socket has just died
+  (happens if the master process crashes)
+- dedicated_process: disable backtrace support when another Libc than GLIBC is used
+  (ex: musl) (thanks to Bernard Cafarelli)
+- dedicated_process: fix build with some Libc (thanks to Bernard Cafarelli)
+
 2021/01/01 - 1.0.9:
 - Fix: dedicated_process: Don't hang when shutting down
   (ea2e964392c9aa5d09465d71fc059d8689c311cb)
