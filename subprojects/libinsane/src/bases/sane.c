@@ -373,6 +373,7 @@ error:
 
 static enum lis_error lis_sane_get_device(struct lis_api *impl, const char *dev_id, struct lis_item **item)
 {
+	SANE_Status sane_err;
 	struct lis_sane_item *private;
 	enum lis_error err;
 	struct lis_sane *impl_private = LIS_SANE_PRIVATE(impl);
@@ -392,7 +393,12 @@ static enum lis_error lis_sane_get_device(struct lis_api *impl, const char *dev_
 	memcpy(&private->parent, &g_sane_item_template, sizeof(private->parent));
 
 	lis_log_debug("sane_open() ...")
-	err = sane_status_to_lis_error(sane_open(dev_id, &private->handle));
+	sane_err = sane_open(dev_id, &private->handle);
+	if (sane_err == SANE_STATUS_INVAL) {
+		err = LIS_ERR_OFFLINE;
+	} else {
+		err = sane_status_to_lis_error(sane_err);
+	}
 	lis_log_debug("sane_open(): 0x%X, %s", err, lis_strerror(err));
 	if (LIS_IS_ERROR(err)) {
 		free(private);
