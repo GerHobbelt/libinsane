@@ -1,10 +1,14 @@
 #include <assert.h>
 #include <errno.h>
+#include <pthread.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
 
 #include <libinsane/log.h>
+
+
+static pthread_mutex_t g_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 
 static const struct lis_log_callbacks g_default_callbacks = {
@@ -65,6 +69,12 @@ void lis_log_stderr(enum lis_log_level lis_lvl, const char *msg)
 }
 
 
+void lis_log_raw(enum lis_log_level lvl, const char *msg)
+{
+	g_current_callbacks->callbacks[lvl](lvl, msg);
+}
+
+
 void lis_log(
 		enum lis_log_level lvl, const char *file, int line, const char *func,
 		const char *msg, ...
@@ -73,6 +83,9 @@ void lis_log(
 	static char g_buffer[2048];
 	int r;
 	va_list ap;
+
+	r = pthread_mutex_lock(&g_mutex);
+	assert(r == 0);
 
 	assert(lvl >= LIS_LOG_LVL_MIN);
 	assert(lvl <= LIS_LOG_LVL_MAX);
@@ -100,4 +113,13 @@ void lis_log(
 	}
 
 	g_current_callbacks->callbacks[lvl](lvl, g_buffer);
+
+	r = pthread_mutex_unlock(&g_mutex);
+	assert(r == 0);
+}
+
+
+void lis_log_reset(void)
+{
+	g_current_callbacks = &g_default_callbacks;
 }
