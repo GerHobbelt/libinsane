@@ -128,23 +128,6 @@ extern enum lis_error lis_api_normalizer_source_types(
 
 
 /*!
- * \brief Ensure there is only supported devices
- *
- * - Culprits: Sane project, Microsoft
- *
- * Sane: Remove v4l devices (video for linux ; Camera).
- *
- * WIA: Video devices are directly stripped by the WIA support module of LibInsane.
- *
- * \param[in] to_wrap Base implementation to wrap.
- * \param[out] out_impl Implementation of the out_impl including the workaround.
- */
-extern enum lis_error lis_api_normalizer_strip_non_scanners(
-	struct lis_api *to_wrap, struct lis_api **out_impl
-);
-
-
-/*!
  * \brief Ensure the output format is RAW
  *
  * - Culprit: Microsoft.
@@ -256,7 +239,15 @@ extern enum lis_error lis_api_normalizer_source_names(
 
 
 /*!
- * \brief Device model name may contain manufacturer name
+ * \brief Clean device descriptors (name, model, etc)
+ *
+ * ## Device model name may contain '_' instead of spaces
+ *
+ * - API: Sane
+ * - Culprit: HP
+ * - Seen on: [all HP devices](https://openpaper.work/scanner_db/vendor/7/)
+ *
+ * ## Device model name may contain manufacturer name
  *
  * - API: Sane, WIA
  * - Culprits: too many. Especially HP.
@@ -279,22 +270,7 @@ extern enum lis_error lis_api_normalizer_source_names(
  * \param[in] to_wrap Base implementation to wrap.
  * \param[out] out_impl Implementation of the out_impl including the workaround.
  */
-extern enum lis_error lis_api_normalizer_clean_dev_model_from_manufacturer(
-	struct lis_api *to_wrap, struct lis_api **out_impl
-);
-
-
-/*!
- * \brief Device model name may contain '_' instead of spaces
- *
- * - API: Sane
- * - Culprit: HP
- * - Seen on: [all HP devices](https://openpaper.work/scanner_db/vendor/7/)
- *
- * \param[in] to_wrap Base implementation to wrap.
- * \param[out] out_impl Implementation of the out_impl including the workaround.
- */
-extern enum lis_error lis_api_normalizer_clean_dev_model_char(
+extern enum lis_error lis_api_normalizer_clean_dev_descs(
 	struct lis_api *to_wrap, struct lis_api **out_impl
 );
 

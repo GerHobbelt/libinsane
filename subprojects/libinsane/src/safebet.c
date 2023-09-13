@@ -59,6 +59,12 @@ static const struct {
 		.enabled_by_default = 1,
 	},
 	{
+		.name = "normalizer_source_names",
+		.env = "LIBINSANE_NORMALIZER_SOURCE_NAMES",
+		.wrap_cb = lis_api_normalizer_source_names,
+		.enabled_by_default = 1,
+	},
+	{
 		.name = "workaround_opt_values",
 		.env = "LIBINSANE_WORKAROUND_OPT_VALUES",
 		.wrap_cb = lis_api_workaround_opt_values,
@@ -86,6 +92,12 @@ static const struct {
 		.name = "normalizer_resolution",
 		.env = "LIBINSANE_NORMALIZER_RESOLUTION",
 		.wrap_cb = lis_api_normalizer_resolution,
+		.enabled_by_default = 1,
+	},
+	{
+		.name = "normalizer_clean_dev_descs",
+		.env = "LIBINSANE_NORMALIZER_CLEAN_DEV_DESCS",
+		.wrap_cb = lis_api_normalizer_clean_dev_descs,
 		.enabled_by_default = 1,
 	},
 };
@@ -142,6 +154,7 @@ enum lis_error lis_safebet(struct lis_api **out_impls)
 						g_implementations[i].name);
 				goto error;
 			}
+			*out_impls = next;
 			nb_impls++;
 		}
 	}
