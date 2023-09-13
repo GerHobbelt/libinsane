@@ -47,6 +47,8 @@ struct wia_transfer {
 
 	struct lis_scan_session scan_session;
 
+	int refcount;
+
 	IStream istream;
 	LisIWiaAppErrorHandler app_error_handler;
 	LisIWiaTransferCallback transfer_callback;
@@ -564,11 +566,21 @@ static enum lis_error get_scan_parameters(
 		return err;
 	}
 
-	assert(output[0].vt == VT_I4);
-	assert(output[1].vt == VT_I4);
-	assert(output[2].vt == VT_I4);
-	assert(output[3].vt == VT_I4);
-	assert(output[4].vt == VT_CLSID);
+	if (output[0].vt != VT_I4 || output[1].vt != VT_I4
+			|| output[2].vt != VT_I4 || output[3].vt != VT_I4) {
+		lis_log_error(
+			"Got unexpected value types for scan frame: %d %d %d %d",
+			output[0].vt, output[1].vt, output[2].vt, output[3].vt
+		);
+		return LIS_ERR_INTERNAL_UNKNOWN_ERROR;
+	}
+	if (output[4].vt != VT_CLSID) {
+		lis_log_error(
+			"Got unexpected value type for scan image format: %d",
+			output[4].vt
+		);
+		return LIS_ERR_INTERNAL_UNKNOWN_ERROR;
+	}
 
 	parameters->width = output[1].lVal - output[0].lVal + 1;
 	parameters->height = output[3].lVal - output[2].lVal + 1;
@@ -626,8 +638,10 @@ static void scan_cancel(struct lis_scan_session *_self)
 
 	self->wia_item->lpVtbl->Release(self->wia_item);
 	self->wia_props->lpVtbl->Release(self->wia_props);
-	// XXX(Jflesch): Crashes on 64bits sometimes. disabled for now.
-	// GlobalFree(self);
+
+	self->istream.lpVtbl->Release(&self->istream);
+	self->app_error_handler.lpVtbl->Release(&self->app_error_handler);
+	self->transfer_callback.lpVtbl->Release(&self->transfer_callback);
 }
 
 
@@ -680,19 +694,38 @@ static HRESULT WINAPI wia_app_error_handler_query_interface(
 }
 
 
-static ULONG WINAPI wia_app_error_handler_add_ref(LisIWiaAppErrorHandler *self)
+static ULONG WINAPI wia_app_error_handler_add_ref(LisIWiaAppErrorHandler *_self)
 {
-	LIS_UNUSED(self);
-	lis_log_info("WiaAppErrorHandler->AddRef()");
-	return 0;
+	struct wia_transfer *self = lis_container_of(
+		_self, struct wia_transfer, app_error_handler
+	);
+
+	self->refcount++;
+	lis_log_info("WiaAppErrorHandler->AddRef() -> %d", self->refcount);
+	return (unsigned long)self->refcount;
+}
+
+static void wia_transfer_release(struct wia_transfer *self)
+{
+	self->refcount--;
+	if (self->refcount == 0) {
+		lis_log_info("Freeing WIA transfer objects");
+		// XXX(JFlesch): Disabled: Some drivers seems to call
+		// Release() far too much (?) (Brother MFC-7360N)
+		// GlobalFree(self);
+	}
 }
 
 
-static ULONG WINAPI wia_app_error_handler_release(LisIWiaAppErrorHandler *self)
+static ULONG WINAPI wia_app_error_handler_release(LisIWiaAppErrorHandler *_self)
 {
-	LIS_UNUSED(self);
-	lis_log_info("WiaAppErrorHandler->Release()");
-	return 0;
+	struct wia_transfer *self = lis_container_of(
+		_self, struct wia_transfer, app_error_handler
+	);
+
+	lis_log_info("WiaAppErrorHandler->Release() <- %d", self->refcount);
+	wia_transfer_release(self);
+	return (unsigned long)self->refcount;
 }
 
 
@@ -776,19 +809,27 @@ static HRESULT WINAPI wia_transfer_cb_query_interface(
 }
 
 
-static ULONG WINAPI wia_transfer_cb_add_ref(LisIWiaTransferCallback *self)
+static ULONG WINAPI wia_transfer_cb_add_ref(LisIWiaTransferCallback *_self)
 {
-	LIS_UNUSED(self);
-	lis_log_info("WiaTransfer->AddRef()");
-	return 0;
+	struct wia_transfer *self = lis_container_of(
+		_self, struct wia_transfer, transfer_callback
+	);
+
+	self->refcount++;
+	lis_log_info("WiaTransfer->AddRef() -> %d", self->refcount);
+	return (unsigned long)self->refcount;
 }
 
 
-static ULONG WINAPI wia_transfer_cb_release(LisIWiaTransferCallback *self)
+static ULONG WINAPI wia_transfer_cb_release(LisIWiaTransferCallback *_self)
 {
-	LIS_UNUSED(self);
-	lis_log_info("WiaTransfer->Release()");
-	return 0;
+	struct wia_transfer *self = lis_container_of(
+		_self, struct wia_transfer, transfer_callback
+	);
+
+	lis_log_info("WiaTransfer->Release() -> %d", self->refcount);
+	wia_transfer_release(self);
+	return (unsigned long)self->refcount;
 }
 
 
@@ -919,19 +960,27 @@ static HRESULT WINAPI wia_stream_query_interface(
 }
 
 
-static ULONG WINAPI wia_stream_add_ref(IStream *self)
+static ULONG WINAPI wia_stream_add_ref(IStream *_self)
 {
-	LIS_UNUSED(self);
-	lis_log_info("IStream->AddRef()");
-	return 0;
+	struct wia_transfer *self = lis_container_of(
+		_self, struct wia_transfer, istream
+	);
+
+	self->refcount++;
+	lis_log_info("IStream->AddRef() -> %d", self->refcount);
+	return (unsigned long)self->refcount;
 }
 
 
-static ULONG WINAPI wia_stream_release(IStream *self)
+static ULONG WINAPI wia_stream_release(IStream *_self)
 {
-	LIS_UNUSED(self);
-	lis_log_info("IStream->Release()");
-	return 0;
+	struct wia_transfer *self = lis_container_of(
+		_self, struct wia_transfer, istream
+	);
+
+	lis_log_info("IStream->Release() <- %d", self->refcount);
+	wia_transfer_release(self);
+	return (unsigned long)self->refcount;
 }
 
 
@@ -1293,6 +1342,10 @@ enum lis_error wia_transfer_new(
 		err = LIS_ERR_NO_MEM;
 		goto err;
 	}
+
+	// The structure wia_transfer actually contains 3 objects:
+	// IStream, IWiaAppErrorHandler and IWiaTransferCallback
+	self->refcount = 3;
 
 	self->wia_item = in_wia_item;
 	self->wia_item->lpVtbl->AddRef(self->wia_item);
