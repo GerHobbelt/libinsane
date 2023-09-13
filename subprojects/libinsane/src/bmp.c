@@ -15,6 +15,7 @@
 
 // XXX(Jflesch): assuming Windows x86 --> little endian
 
+#define le16toh(v) (v)
 #define le32toh(v) (v)
 #define htole32(v) (v)
 #define htole16(v) (v)
@@ -67,9 +68,9 @@ enum lis_error lis_bmp2scan_params(
 		);
 		return LIS_ERR_INTERNAL_IMG_FORMAT_NOT_SUPPORTED;
 	}
-	if (le32toh(header->nb_bits_per_pixel) != 24) {
+	if (le16toh(header->nb_bits_per_pixel) != 24) {
 		lis_log_error("BMP: Unexpected nb bits per pixel: %u (0x%X)",
-				le32toh(header->nb_bits_per_pixel),
+				le16toh(header->nb_bits_per_pixel),
 				header->nb_bits_per_pixel);
 		return LIS_ERR_INTERNAL_IMG_FORMAT_NOT_SUPPORTED;
 	}
