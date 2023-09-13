@@ -114,12 +114,35 @@ extern enum lis_error lis_api_workaround_check_capabilities(
 );
 
 
+/*!
+ * \brief Disable source 'Auto'
+ *
+ * - API: Sane
+ * - Culprit: HP Photosmart C410 (possible others)
+ *
+ * Flatbed can only contain one single page. However when requesting
+ * another page/image, some drivers keep saying "yeah sure no problem"
+ * instead of "no more pages", and keep returning the same page/image
+ * again and again. The workaround 'one_page_flatbed' work around this
+ * problem by looking at the source name and guessing whether we should
+ * expect only one page or more. Thing is, when using the source 'auto',
+ * this workaround has no way of guessing. So this workaround doesn't
+ * work with the source 'auto'.
+ *
+ * Therefore, the simplest solution is to hide the source 'auto' when using
+ * Sane.
+ */
+extern enum lis_error lis_api_workaround_hide_source_auto(
+	struct lis_api *to_wrap, struct lis_api **out_impl
+);
+
+
 #ifdef OS_LINUX
 /*!
  * \brief Access scanners through a dedicated process.
  *
  * - API: Sane
- * - Culprit: Brother drivers, old HP drivers
+ * - Culprits: Brother drivers, old HP drivers
  *
  * Sane backends run as part of the application that use them. However some of
  * them are unstable: some corrupt memory, some cause crashes, etc. Some appear
@@ -203,7 +226,7 @@ extern enum lis_error lis_api_workaround_cache(
  * \brief Turns the lamp off at the end of the scan
  *
  * - API: Sane
- * - Culprit: Canon Lide 30 + Sane backend Plustek
+ * - Culprits: Canon Lide 30 + Sane backend Plustek
  *
  * When scanning with the Canon Lide 30, the driver doesn't turn off the
  * lamp at the end of the scan. Without this workaround, the lamp remains
