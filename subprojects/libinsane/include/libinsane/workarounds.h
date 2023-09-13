@@ -30,10 +30,10 @@ extern "C" {
  * This workaround replaces it by an option option 'source'.
  *
  * \param[in] to_wrap Base implementation to wrap.
- * \param[out] api Implementation of the API including the workaround.
+ * \param[out] out_impl Implementation of the out_impl including the workaround.
  */
 extern enum lis_error lis_api_workaround_opt_names(
-	struct lis_api *to_wrap, struct lis_api **api
+	struct lis_api *to_wrap, struct lis_api **out_impl
 );
 
 
@@ -68,74 +68,10 @@ extern enum lis_error lis_api_workaround_opt_names(
  * This workaround wraps a bunch of options, and try to revert the translations back to English.
  *
  * \param[in] to_wrap Base implementation to wrap.
- * \param[out] api Implementation of the API including the workaround.
+ * \param[out] out_impl Implementation of the out_impl including the workaround.
  */
 extern enum lis_error lis_api_workaround_opt_values(
-	struct lis_api *to_wrap, struct lis_api **api
-);
-
-
-/*!
- * \brief Extra options 'page-height' and 'page-width'
- *
- * - API: Sane
- * - Culprit: Fujitsu
- * - Seen on: [Fujitsu ScanSnap S1500](https://github.com/openpaperwork/paperwork/issues/230#issuecomment-22792362)
- *
- * This workaround wraps the option `br_x`, `tl_x`, `br_y` and `tl_y` in order to
- * set `page-height` and `page-width` accordingly.
- *
- * \todo Need to figure out how to set them exactly. Currently: set proportionally to (br_x - tl_x,
- *		br_y - tl_y).
- * \param[in] to_wrap Base implementation to wrap.
- * \param[out] api Implementation of the API including the workaround.
- */
-extern enum lis_error lis_api_workaround_opts_page_size(
-	struct lis_api *to_wrap, struct lis_api **api
-);
-
-
-/*!
- * \brief Device model name may contain manufacturer name
- *
- * - API: Sane, WIA
- * - Culprits: too many. Especially HP.
- *
- * If the model name contains also the manufacturer name, this workaround strips it.
- *
- * Random example:
- *
- * - Manufacturer: Brother
- * - Model: Brother MFC-7360N
- *
- * Will become:
- *
- * - Manufacturer: Brother
- * - Model: MFC-7360N
- *
- * Special case: HP. Manufacturer is "hewlett-packard", but
- * [model names contain the prefix "hp"](https://openpaper.work/scanner_db/vendor/7/).
- *
- * \param[in] to_wrap Base implementation to wrap.
- * \param[out] api Implementation of the API including the workaround.
- */
-extern enum lis_error lis_api_workaround_clean_dev_model_from_manufacturer(
-	struct lis_api *to_wrap, struct lis_api **api
-);
-
-
-/*!
- * \brief Device model name may contain '_' instead of spaces
- *
- * - API: Sane
- * - Culprit: HP
- * - Seen on: [all HP devices](https://openpaper.work/scanner_db/vendor/7/)
- *
- * \param[in] to_wrap Base implementation to wrap.
- * \param[out] api Implementation of the API including the workaround.
- */
-extern enum lis_error lis_api_workaround_clean_dev_model_char(
-	struct lis_api *to_wrap, struct lis_api **api
+	struct lis_api *to_wrap, struct lis_api **out_impl
 );
 
 
@@ -149,10 +85,10 @@ extern enum lis_error lis_api_workaround_clean_dev_model_char(
  * Some may even crash if the user application tries to set a value on an inactive option.
  *
  * \param[in] to_wrap Base implementation to wrap.
- * \param[out] api Implementation of the API including the workaround.
+ * \param[out] out_impl Implementation of the out_impl including the workaround.
  */
 extern enum lis_error lis_api_workaround_no_read_on_inactive_opt(
-	struct lis_api *to_wrap, struct lis_api **api
+	struct lis_api *to_wrap, struct lis_api **out_impl
 );
 
 
@@ -166,10 +102,10 @@ extern enum lis_error lis_api_workaround_no_read_on_inactive_opt(
  * This workaround makes it defined: it always returns an error.
  *
  * \param[in] to_wrap Base implementation to wrap.
- * \param[out] api Implementation of the API including the workaround.
+ * \param[out] out_impl Implementation of the out_impl including the workaround.
  */
 extern enum lis_error lis_api_workaround_no_write_on_readonly_opt(
-	struct lis_api *to_wrap, struct lis_api **api
+	struct lis_api *to_wrap, struct lis_api **out_impl
 );
 
 
@@ -186,7 +122,7 @@ extern enum lis_error lis_api_workaround_no_write_on_readonly_opt(
  * and doesn't even set it.
  */
 extern enum lis_error lis_api_workaround_no_write_on_single_value_opt(
-	struct lis_api *to_wrap, struct lis_api **api
+	struct lis_api *to_wrap, struct lis_api **out_impl
 );
 
 
@@ -202,10 +138,10 @@ extern enum lis_error lis_api_workaround_no_write_on_single_value_opt(
  * the job and making all the request go through this thread.
  *
  * \param[in] to_wrap Base implementation to wrap.
- * \param[out] api Implementation of the API including the workaround.
+ * \param[out] out_impl Implementation of the out_impl including the workaround.
  */
 extern enum lis_error lis_api_workaround_dedicated_thread(
-	struct lis_api *to_wrap, struct lis_api **api
+	struct lis_api *to_wrap, struct lis_api **out_impl
 );
 
 #ifdef __cplusplus

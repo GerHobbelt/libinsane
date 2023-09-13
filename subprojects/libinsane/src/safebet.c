@@ -73,6 +73,14 @@ enum lis_error lis_safebet(struct lis_api **out_impls)
 		*out_impls = next;
 	}
 
+	if (lis_getenv("LIBINSANE_NORMALIZER_MIN_ONE_SOURCE", 1)) {
+		err = lis_api_normalizer_min_one_source(*out_impls, &next);
+		if (LIS_IS_ERROR(err)) {
+			goto error;
+		}
+		*out_impls = next;
+	}
+
 	if (lis_getenv("LIBINSANE_WORKAROUND_OPT_VALUES", 1)) {
 		err = lis_api_workaround_opt_values(*out_impls, &next);
 		if (LIS_IS_ERROR(err)) {
@@ -99,6 +107,14 @@ enum lis_error lis_safebet(struct lis_api **out_impls)
 
 	if (lis_getenv("LIBINSANE_NORMALIZER_SOURCE_TYPES", 1)) {
 		err = lis_api_normalizer_source_types(*out_impls, &next);
+		if (LIS_IS_ERROR(err)) {
+			goto error;
+		}
+		*out_impls = next;
+	}
+
+	if (lis_getenv("LIBINSANE_NORMALIZER_RESOLUTION", 1)) {
+		err = lis_api_normalizer_resolution(*out_impls, &next);
 		if (LIS_IS_ERROR(err)) {
 			goto error;
 		}

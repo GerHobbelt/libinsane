@@ -21,10 +21,10 @@ extern "C" {
  * simulated.
  *
  * \param[in] to_wrap Base implementation to wrap.
- * \param[out] impl Implementation of the API including the workaround.
+ * \param[out] out_impl Implementation of the out_impl including the workaround.
  */
 extern enum lis_error lis_api_normalizer_source_nodes(
-		struct lis_api *to_wrap, struct lis_api **impl
+		struct lis_api *to_wrap, struct lis_api **out_impl
 );
 
 
@@ -40,10 +40,10 @@ extern enum lis_error lis_api_normalizer_source_nodes(
  * If there is no source at all, this normalization will create a fake one.
  *
  * \param[in] to_wrap Base implementation to wrap.
- * \param[out] impl Implementation of the API including the workaround.
+ * \param[out] out_impl Implementation of the out_impl including the workaround.
  */
 extern enum lis_error lis_api_normalizer_min_one_source(
-	struct lis_api *to_wrap, struct lis_api **impl
+	struct lis_api *to_wrap, struct lis_api **out_impl
 );
 
 
@@ -62,10 +62,10 @@ extern enum lis_error lis_api_normalizer_min_one_source(
  * sources. Scanner options must be mapped on all its sources.
  *
  * \param[in] to_wrap Base implementation to wrap.
- * \param[out] impl Implementation of the API including the workaround.
+ * \param[out] out_impl Implementation of the out_impl including the workaround.
  */
 extern enum lis_error lis_api_normalizer_all_opts_on_all_sources(
-	struct lis_api *to_wrap, struct lis_api **impl
+	struct lis_api *to_wrap, struct lis_api **out_impl
 );
 
 
@@ -79,10 +79,10 @@ extern enum lis_error lis_api_normalizer_all_opts_on_all_sources(
  * options, and any change to these options is applied back to the WIA2 options.
  *
  * \param[in] to_wrap Base implementation to wrap.
- * \param[out] impl Implementation of the API including the workaround.
+ * \param[out] out_impl Implementation of the out_impl including the workaround.
  */
 extern enum lis_error lis_api_normalizer_scan_area_opts(
-	struct lis_api *to_wrap, struct lis_api **impl
+	struct lis_api *to_wrap, struct lis_api **out_impl
 );
 
 
@@ -101,10 +101,10 @@ extern enum lis_error lis_api_normalizer_scan_area_opts(
  * C API)
  *
  * \param[in] to_wrap Base implementation to wrap.
- * \param[out] impl Implementation of the API including the workaround.
+ * \param[out] out_impl Implementation of the out_impl including the workaround.
  */
-extern enum lis_error lis_api_normalizer_resolution_format(
-	struct lis_api *to_wrap, struct lis_api **impl
+extern enum lis_error lis_api_normalizer_resolution(
+	struct lis_api *to_wrap, struct lis_api **out_impl
 );
 
 
@@ -120,10 +120,10 @@ extern enum lis_error lis_api_normalizer_resolution_format(
  * See \ref lis_item.type.
  *
  * \param[in] to_wrap Base implementation to wrap.
- * \param[out] impl Implementation of the API including the workaround.
+ * \param[out] out_impl Implementation of the out_impl including the workaround.
  */
 extern enum lis_error lis_api_normalizer_source_types(
-	struct lis_api *to_wrap, struct lis_api **impl
+	struct lis_api *to_wrap, struct lis_api **out_impl
 );
 
 
@@ -137,10 +137,10 @@ extern enum lis_error lis_api_normalizer_source_types(
  * WIA: Video devices are directly stripped by the WIA support module of LibInsane.
  *
  * \param[in] to_wrap Base implementation to wrap.
- * \param[out] impl Implementation of the API including the workaround.
+ * \param[out] out_impl Implementation of the out_impl including the workaround.
  */
 extern enum lis_error lis_api_normalizer_strip_non_scanners(
-	struct lis_api *to_wrap, struct lis_api **impl
+	struct lis_api *to_wrap, struct lis_api **out_impl
 );
 
 
@@ -162,10 +162,10 @@ extern enum lis_error lis_api_normalizer_strip_non_scanners(
  * [must support the BMP format](https://msdn.microsoft.com/en-us/ie/ff546016(v=vs.94)).
  *
  * \param[in] to_wrap Base implementation to wrap.
- * \param[out] impl Implementation of the API including the workaround.
+ * \param[out] out_impl Implementation of the out_impl including the workaround.
  */
 extern enum lis_error lis_api_normalizer_raw(
-	struct lis_api *to_wrap, struct lis_api **impl
+	struct lis_api *to_wrap, struct lis_api **out_impl
 );
 
 
@@ -180,50 +180,19 @@ extern enum lis_error lis_api_normalizer_raw(
  * This normalization ensures the output image is always in RAW24 (RGB).
  *
  * \param[in] to_wrap Base implementation to wrap.
- * \param[out] impl Implementation of the API including the workaround.
+ * \param[out] out_impl Implementation of the out_impl including the workaround.
  */
 extern enum lis_error lis_api_normalizer_raw24(
-	struct lis_api *to_wrap, struct lis_api **impl
-);
-
-
-/*!
- * \brief Ensure the behavior is always the same whenever we scan from a flatbed or a feeder.
- *
- * - Culprits: Sane project, Microsoft
- *
- * Seen with some drivers with both Sane and WIA:
- *
- * - When scanning from feeder: at the end of a scan, we get an error code
- *   (or a function call) telling us when the whole page has been scanned.
- *   When requesting another scan, it will scan the next page. It no next
- *   page is available, another error code (or function call) will tell
- *   us we have reached the end.
- * - When scanning from flatbed: at the end of a scan, we get an error code
- *   (or a function call) telling us when the whole page has been scanned.
- *   Requesting another scan, it will sometimes scan again the very same page.
- *   It will never tell us that there is no paper left to scan
- *
- * Problem: Behavior should be independent of the actual source. Having 2 behaviors
- * is just bug-prone.
- *
- * Wanted behavior:
- *
- * - When scanning from feeder: unchanged
- * - When scanning from flatbed: the first scan is unchanged. When requesting
- *   a second scan, it must return an error code indicating that there is
- *   no paper left to scan.
- *
- * \param[in] to_wrap Base implementation to wrap.
- * \param[out] impl Implementation of the API including the workaround.
- */
-extern enum lis_error lis_api_normalizer_flatbed_and_feeder_behavior(
-	struct lis_api *to_wrap, struct lis_api **impl
+	struct lis_api *to_wrap, struct lis_api **out_impl
 );
 
 
 /*!
  * \brief Set safest default values
+ *
+ * ## Ensure default mode is Color
+ *
+ * Not all scanner have mode=Color by default
  *
  * ## Ensure the scan area is set to the maximum by default.
  *
@@ -240,11 +209,23 @@ extern enum lis_error lis_api_normalizer_flatbed_and_feeder_behavior(
  *
  * Requires: \ref lis_api_workaround_opt_values
  *
+ * ## Fujistu: Extra options 'page-height' and 'page-width'
+ *
+ * - API: Sane
+ * - Culprit: Fujitsu
+ * - Seen on: [Fujitsu ScanSnap S1500](https://github.com/openpaperwork/paperwork/issues/230#issuecomment-22792362)
+ *   and [Fujistu ScanSnap iX500](https://openpaper.work/en/scanner_db/report/122/)
+ *
+ * Fujistu provides 2 extra settings, 'page-height' and 'page-width'. 'page-height' use case is unknown,
+ * but 'page-width' is used for automatic centering of the page.
+ * The default values are bad and this feature is specific to Fujistu ==> set them to the max
+ * by default to disable automatic centering.
+ *
  * \param[in] to_wrap Base implementation to wrap.
- * \param[out] impl Implementation of the API including the workaround.
+ * \param[out] out_impl Implementation of the out_impl including the workaround.
  */
 extern enum lis_error lis_api_normalizer_safe_defaults(
-	struct lis_api *to_wrap, struct lis_api **impl
+	struct lis_api *to_wrap, struct lis_api **out_impl
 );
 
 
@@ -267,11 +248,56 @@ extern enum lis_error lis_api_normalizer_safe_defaults(
  * - 'Document Table' --> 'flatbed' (Epson perfection v19)
  *
  * \param[in] to_wrap Base implementation to wrap.
- * \param[out] impl Implementation of the API including the workaround.
+ * \param[out] out_impl Implementation of the out_impl including the workaround.
  */
 extern enum lis_error lis_api_normalizer_source_names(
-	struct lis_api *to_wrap, struct lis_api **impl
+	struct lis_api *to_wrap, struct lis_api **out_impl
 );
+
+
+/*!
+ * \brief Device model name may contain manufacturer name
+ *
+ * - API: Sane, WIA
+ * - Culprits: too many. Especially HP.
+ *
+ * If the model name contains also the manufacturer name, this workaround strips it.
+ *
+ * Random example:
+ *
+ * - Manufacturer: Brother
+ * - Model: Brother MFC-7360N
+ *
+ * Will become:
+ *
+ * - Manufacturer: Brother
+ * - Model: MFC-7360N
+ *
+ * Special case: HP. Manufacturer is "hewlett-packard", but
+ * [model names contain the prefix "hp"](https://openpaper.work/scanner_db/vendor/7/).
+ *
+ * \param[in] to_wrap Base implementation to wrap.
+ * \param[out] out_impl Implementation of the out_impl including the workaround.
+ */
+extern enum lis_error lis_api_normalizer_clean_dev_model_from_manufacturer(
+	struct lis_api *to_wrap, struct lis_api **out_impl
+);
+
+
+/*!
+ * \brief Device model name may contain '_' instead of spaces
+ *
+ * - API: Sane
+ * - Culprit: HP
+ * - Seen on: [all HP devices](https://openpaper.work/scanner_db/vendor/7/)
+ *
+ * \param[in] to_wrap Base implementation to wrap.
+ * \param[out] out_impl Implementation of the out_impl including the workaround.
+ */
+extern enum lis_error lis_api_normalizer_clean_dev_model_char(
+	struct lis_api *to_wrap, struct lis_api **out_impl
+);
+
 
 #ifdef __cplusplus
 }
