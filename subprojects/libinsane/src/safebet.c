@@ -22,18 +22,6 @@
 #endif
 
 
-static int lis_getenv(const char *var, int default_val)
-{
-	const char *val_str;
-
-	val_str = getenv(var);
-	if (val_str == NULL) {
-		return default_val;
-	}
-	return atoi(val_str);
-}
-
-
 static const struct {
 	const char *name;
 	const char *env;
@@ -83,6 +71,16 @@ static const struct {
 		.enabled_by_default = 1,
 	},
 	{
+		.name = "normalizer_bmp2raw",
+		.env = "LIBINSANE_NORMALIZER_BMP2RAW",
+		.wrap_cb = lis_api_normalizer_bmp2raw,
+#ifdef OS_WINDOWS
+		.enabled_by_default = 1, /* WIA returns BMP images */
+#else
+		.enabled_by_default = 0, /* Sane returns various RAW formats */
+#endif
+	},
+	{
 		.name = "normalizer_raw24",
 		.env = "LIBINSANE_NORMALIZER_RAW24",
 		.wrap_cb = lis_api_normalizer_raw24,
@@ -105,6 +103,12 @@ static const struct {
 		.enabled_by_default = 1,
 	},
 	{
+		.name = "workaround_one_page_flatbed",
+		.env = "LIBINSANE_WORKAROUND_ONE_PAGE_FLATBED",
+		.wrap_cb = lis_api_workaround_one_page_flatbed,
+		.enabled_by_default = 1,
+	},
+	{
 		.name = "normalizer_clean_dev_descs",
 		.env = "LIBINSANE_NORMALIZER_CLEAN_DEV_DESCS",
 		.wrap_cb = lis_api_normalizer_clean_dev_descs,
@@ -114,6 +118,12 @@ static const struct {
 		.name = "normalizer_safe_defaults",
 		.env = "LIBINSANE_NORMALIZER_SAFE_DEFAULTS",
 		.wrap_cb = lis_api_normalizer_safe_defaults,
+		.enabled_by_default = 1,
+	},
+	{	// dedicated thread wrapper should be loaded last
+		.name = "workaround_dedicated_thread",
+		.env = "LIBINSANE_WORKAROUND_DEDICATED_THREAD",
+		.wrap_cb = lis_api_workaround_dedicated_thread,
 		.enabled_by_default = 1,
 	},
 };

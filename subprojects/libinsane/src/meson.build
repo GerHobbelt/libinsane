@@ -1,10 +1,11 @@
-LIBINSANE_SRCS = files(
+libinsane_srcs = files(
     'bases/dumb.c',
     'basewrapper.c',
     'error.c',
     'log.c',
     'multiplexer.c',
     'normalizers/all_opts_on_all_sources.c',
+    'normalizers/bmp.c',
     'normalizers/bmp2raw.c',
     'normalizers/clean_dev_descs.c',
     'normalizers/min_one_source.c',
@@ -19,28 +20,30 @@ LIBINSANE_SRCS = files(
     'str2impls.c',
     'workarounds/dedicated_thread.c',
     'workarounds/check_capabilities.c',
+    'workarounds/one_page_flatbed.c',
     'workarounds/opt_names.c',
     'workarounds/opt_values.c',
     'util.c',
 )
 
+deps = [dependency('threads')]
+
 if host_machine.system() == 'windows'
-    LIBINSANE_SRCS += [
+    libinsane_srcs += [
         'bases/twain.c',
         'bases/wia_automation.c',
         'bases/wia_ll.c',
     ]
-    SANE = []
 else
-    LIBINSANE_SRCS += [
+    libinsane_srcs += [
         'bases/sane.c',
     ]
-    SANE = dependency('sane-backends')
+    deps += dependency('sane-backends')
 endif
 
-libinsane = library('insane', LIBINSANE_SRCS,
+libinsane = library('insane', libinsane_srcs,
     include_directories: libinsane_inc,
-    dependencies: SANE,
+    dependencies: deps,
     install: true)
 libinsane_dep = declare_dependency(
     include_directories: libinsane_inc,
