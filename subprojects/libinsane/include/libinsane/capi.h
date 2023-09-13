@@ -160,12 +160,12 @@ struct lis_option_descriptor {
 		 */
 		union {
 			/*!
-			 * If \ref lis_option_descriptor.value.type == \ref LIS_CONSTRAINT_RANGE.
+			 * If \ref lis_option_descriptor.type == \ref LIS_CONSTRAINT_RANGE.
 			 */
 			struct lis_value_range range;
 
 			/*!
-			 * If \ref lis_option_descriptor.value.type == \ref LIS_CONSTRAINT_LIST.
+			 * If \ref lis_option_descriptor.type == \ref LIS_CONSTRAINT_LIST.
 			 */
 			struct lis_value_list list;
 		} possible;
@@ -249,14 +249,15 @@ struct lis_scan_parameters {
 
 struct lis_scan_session {
 	/*!
-	 * \brief Indicates if we have reached the end of the feed
+	 * \brief Indicates if we have reached the end of the feed.
+	 * Should be called at least each time \ref end_of_page returns 1.
 	 */
 	int (*end_of_feed)(struct lis_scan_session *session);
 
 	/*!
-	 * \brief Indicates if we have reached the end of the page being currently scanned
-	 * If an error must occur, it will occur on \ref scan_read(), including a possible
-	 * LIS_ER_
+	 * \brief Indicates if we have reached the end of the page being currently scanned.
+	 * Should be called before each call to \ref scan_read().
+	 * If an error must occur, it will occur on \ref scan_read().
 	 */
 	int (*end_of_page)(struct lis_scan_session *session);
 
@@ -271,14 +272,14 @@ struct lis_scan_session {
 	 *		\ref LIS_IS_ERROR().
 	 * \warning You should manage every non-error return value carefully.
 	 * \retval LIS_OK A chunk of the current page/image has been read.
-	 * \retval LIS_CANCELLED Scan has been cancelled by \ref scan_cancel() or by hardware.
+	 * \retval LIS_CANCELLED Scan has been cancelled by \ref lis_scan_session.cancel() or by hardware.
 	 *		You can throw the image chunks you got away. Do not call again \ref scan_read().
-	 *		Do not call \ref scan_read() or \ref scan_cancel() again.
-	 * \retval LIS_END_OF_PAGE A whole page has been read. Call again \ref scan_read() to read
+	 *		Do not call \ref lis_scan_session.scan_read() or \ref lis_scan_session.cancel() again.
+	 * \retval LIS_END_OF_PAGE A whole page has been read. Call again \ref lis_scan_session.scan_read() to read
 	 *		the next page.
-	 * \retval LIS_END_OF_FEED A whole page feed has been read. Do not call \ref scan_cancel().
+	 * \retval LIS_END_OF_FEED A whole page feed has been read. Do not call \ref lis_scan_session.cancel().
 	 * \retval LIS_WARMING_UP Scanner is warming up. No data available yet. Keep calling
-	 *		\ref scan_read() until there is.
+	 *		\ref lis_scan_session.scan_read() until there is.
 	 */
 	enum lis_error (*scan_read) (
 		struct lis_scan_session *session, void *out_buffer, size_t *buffer_size
@@ -335,7 +336,7 @@ struct lis_item {
 	 * Format is guaranteed to be right.
 	 *
 	 * Beware: Width is only guaranteed once a scan session has been started
-	 * (see \ref lis_iten.scan_start).
+	 * (see \ref lis_item.scan_start).
 	 *
 	 * Beware: Height is never guaranteed (usually the scan will be shorted,
 	 * but it may also be longer !).
