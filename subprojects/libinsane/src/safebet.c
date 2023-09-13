@@ -144,6 +144,12 @@ static const struct {
 		.enabled_by_default = 1,
 	},
 	{
+		.name = "workaround_invalid_page_size",
+		.env = "LIBINSANE_WORKAROUND_INVALID_PAGE_SIZE",
+		.wrap_cb = lis_api_workaround_invalid_page_size,
+		.enabled_by_default = 1,
+	},
+	{
 		.name = "workaround_one_page_flatbed",
 		.env = "LIBINSANE_WORKAROUND_ONE_PAGE_FLATBED",
 		.wrap_cb = lis_api_workaround_one_page_flatbed,

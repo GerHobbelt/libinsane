@@ -214,38 +214,38 @@ static enum lis_error read_stderr(struct lis_pipes *pipes, enum lis_log_level *l
 {
 	*lvl = LIS_LOG_LVL_INFO;
 
-	if (pipes->sorted.stderr[0] < 0) {
+	if (pipes->sorted.std_err[0] < 0) {
 		// pipe has been closed on purpose
 		return LIS_ERR_IO_ERROR;
 	}
 
-	if (pipes->stderr.total <= 0) {
-		pipes->stderr.current = 0;
-		memset(pipes->stderr.buf, 0, sizeof(pipes->stderr.buf));
-		pipes->stderr.total = read(pipes->sorted.stderr[0], pipes->stderr.buf, sizeof(pipes->stderr.buf) - 1);
-		if (pipes->stderr.total < 0) {
+	if (pipes->std_err.total <= 0) {
+		pipes->std_err.current = 0;
+		memset(pipes->std_err.buf, 0, sizeof(pipes->std_err.buf));
+		pipes->std_err.total = read(pipes->sorted.std_err[0], pipes->std_err.buf, sizeof(pipes->std_err.buf) - 1);
+		if (pipes->std_err.total < 0) {
 			lis_log_error("read() failed: %d, %s", errno, strerror(errno));
 			return LIS_ERR_IO_ERROR;
 		}
-		if (pipes->stderr.total == 0) {
+		if (pipes->std_err.total == 0) {
 			*msg = NULL;
 			return LIS_OK;
 		}
 	}
 
-	*msg = pipes->stderr.buf + pipes->stderr.current;
+	*msg = pipes->std_err.buf + pipes->std_err.current;
 
-	for ( ; pipes->stderr.current < pipes->stderr.total ; pipes->stderr.current++) {
-		if (pipes->stderr.buf[pipes->stderr.current] == '\n') {
-			pipes->stderr.buf[pipes->stderr.current] = '\0';
-			pipes->stderr.current += 1;
+	for ( ; pipes->std_err.current < pipes->std_err.total ; pipes->std_err.current++) {
+		if (pipes->std_err.buf[pipes->std_err.current] == '\n') {
+			pipes->std_err.buf[pipes->std_err.current] = '\0';
+			pipes->std_err.current += 1;
 			return LIS_OK;
-		} else if (pipes->stderr.buf[pipes->stderr.current] == '\0') {
+		} else if (pipes->std_err.buf[pipes->std_err.current] == '\0') {
 			break;
 		}
 	}
-	pipes->stderr.current = 0;
-	pipes->stderr.total = 0;
+	pipes->std_err.current = 0;
+	pipes->std_err.total = 0;
 
 	if ((*msg)[0] == '\0') {
 		*msg = NULL;
@@ -265,7 +265,7 @@ enum lis_error lis_protocol_log_read(struct lis_pipes *pipes, enum lis_log_level
 			.revents = 0,
 		},
 		{
-			.fd = pipes->sorted.stderr[0],
+			.fd = pipes->sorted.std_err[0],
 			.events = POLLIN,
 			.revents = 0,
 		},
@@ -275,7 +275,7 @@ enum lis_error lis_protocol_log_read(struct lis_pipes *pipes, enum lis_log_level
 
 	*msg = NULL;
 
-	if (pipes->stderr.total > 0) {
+	if (pipes->std_err.total > 0) {
 		return read_stderr(pipes, lvl, msg);
 	}
 
@@ -320,11 +320,11 @@ enum lis_error lis_protocol_log_read(struct lis_pipes *pipes, enum lis_log_level
 				close(pipes->sorted.logs[0]);
 				pipes->sorted.logs[0] = -1;
 			}
-			if (fds[i].fd == pipes->sorted.stderr[0]) {
-				close(pipes->sorted.stderr[0]);
-				pipes->sorted.stderr[0] = -1;
+			if (fds[i].fd == pipes->sorted.std_err[0]) {
+				close(pipes->sorted.std_err[0]);
+				pipes->sorted.std_err[0] = -1;
 			}
-			if (pipes->sorted.logs[0] < 0 && pipes->sorted.stderr[0] < 0) {
+			if (pipes->sorted.logs[0] < 0 && pipes->sorted.std_err[0] < 0) {
 				return LIS_ERR_IO_ERROR;
 			}
 			return LIS_OK;

@@ -26,7 +26,7 @@ sudo apt install \
         valac
 
 # optional dependencies for static analysis
-sudo apt install sparse clang-tidy-7
+sudo apt install sparse clang-tidy-11
 ```
 
 #### Build dependencies for Fedora
@@ -124,17 +124,17 @@ If you plan on compiling your program as a 32bits executable:
 ```
 pacman -S \
         make \
-        mingw-w64-i686-cunit \
-        mingw-w64-i686-doxygen \
-        mingw-w64-i686-gcc \
-        mingw-w64-i686-gobject-introspection \
-        mingw-w64-i686-meson \
-        mingw-w64-i686-python3-gobject \
-        mingw-w64-i686-vala
+        mingw-w64-x86_64-cunit \
+        mingw-w64-x86_64-doxygen \
+        mingw-w64-x86_64-gcc \
+        mingw-w64-x86_64-gobject-introspection \
+        mingw-w64-x86_64-meson \
+        mingw-w64-x86_64-python3-gobject \
+        mingw-w64-x86_64-vala
 ```
 
-If you plan on compiling your program as a 64bits executable, you just
-have to replace all the `i686` by `x86_64`.
+If you plan on compiling your program as a 32bits executable, you just
+have to replace all the `x86_64` by `i686`.
 
 
 #### Windows: Compilation
@@ -147,21 +147,21 @@ cd libinsane
 # make will call meson. The first thing meson will do is to generate the ninja
 # build files. Those files include the value of 'PREFIX'. So even if you don't
 # install Libinsane at this step, you must already specify the PREFIX path.
-# Replace '/mingw32' by '/mingw64' below if you want to build 64 bits binaries.
-make PREFIX=/mingw32
-make test PREFIX=/mingw32 # optional
+# Replace '/mingw64' by '/mingw32' below if you want to build 32 bits binaries.
+make PREFIX=/mingw64
+make test PREFIX=/mingw64 # optional
 ```
 
 
 #### Installation
 
 Depending whether you intend to build a 32bits executable for your application
-or a 64bits executable, you will have to install Libinsane in either `/mingw32`
-or `/mingw64`:
+or a 64bits executable, you will have to install Libinsane in either `/mingw64`
+or `/mingw32`:
 
 ```
-# Replace '/mingw32' by '/mingw64' below if you want to build 64 bits binaries
-make install PREFIX=/mingw32
+# Replace '/mingw64' by '/mingw32' below if you want to build 32 bits binaries
+make install PREFIX=/mingw64
 ```
 
 

@@ -25,6 +25,7 @@ libinsane_srcs = files(
     'workarounds/check_capabilities.c',
     'workarounds/dedicated_thread.c',
     'workarounds/hide_source_auto.c',
+    'workarounds/invalid_page_size.c',
     'workarounds/lamp.c',
     'workarounds/one_page_flatbed.c',
     'workarounds/opt_names.c',

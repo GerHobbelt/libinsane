@@ -35,6 +35,8 @@ struct lis_raw24_scan_session
 	struct lis_item *item;
 
 	struct lis_scan_parameters params;
+	int pixels_padding_per_line;
+	int bytes_padding_per_line;
 	int w; /* position in the current line */
 };
 #define LIS_RAW24_SCAN_SESSION_PRIVATE(session) \
@@ -113,6 +115,7 @@ static enum lis_error lis_raw24_get_scan_parameters(
 	enum lis_error err;
 	struct lis_raw24_scan_session *private = \
 		LIS_RAW24_SCAN_SESSION_PRIVATE(self);
+	int bytes_per_line;
 
 	err = private->wrapped->get_scan_parameters(
 		private->wrapped, params
@@ -132,30 +135,46 @@ static enum lis_error lis_raw24_get_scan_parameters(
 		);
 	}
 
+	bytes_per_line = params->image_size / params->height;
+
+	private->bytes_padding_per_line = 0;
+	private->pixels_padding_per_line = 0;
+
 	switch(params->format) {
 		case LIS_IMG_FORMAT_RAW_RGB_24:
+			private->bytes_padding_per_line = (
+				bytes_per_line - (params->width * 3)
+			);
+			params->format = LIS_IMG_FORMAT_RAW_RGB_24;
+			private->params.image_size = params->image_size = (
+				params->width * params->height * 3
+			);
 			return LIS_OK;
 		case LIS_IMG_FORMAT_GRAYSCALE_8:
 			lis_log_info(
 				"Will automatically convert from"
 				" grayscale to RGB"
 			);
+			private->bytes_padding_per_line = (
+				bytes_per_line - params->width
+			);
 			params->format = LIS_IMG_FORMAT_RAW_RGB_24;
-			params->image_size *= 3;
-			if (private != NULL) {
-				private->params.image_size *= 3;
-			}
+			private->params.image_size = params->image_size = (
+				params->width * params->height * 3
+			);
 			return LIS_OK;
 		case LIS_IMG_FORMAT_BW_1:
 			lis_log_info(
 				"Will automatically convert from"
 				" B&W to RGB"
 			);
+			private->pixels_padding_per_line = (
+				(bytes_per_line * 8) - params->width
+			);
 			params->format = LIS_IMG_FORMAT_RAW_RGB_24;
-			params->image_size *= 8 * 3;
-			if (private != NULL) {
-				private->params.image_size *= 3;
-			}
+			private->params.image_size = params->image_size = (
+				params->width * params->height * 3
+			);
 			return LIS_OK;
 		default:
 			break;
@@ -286,7 +305,7 @@ static enum lis_error raw1_scan_read(
 
 	if (*out_buffer_size < 8 * 3) {
 		lis_log_error(
-			"Buffer too small (%ldB < 24), Cannot unpack raw8",
+			"Buffer too small (%ldB < 24), Cannot unpack raw1",
 			(long)*out_buffer_size
 		);
 		*out_buffer_size = 0;
@@ -300,9 +319,8 @@ static enum lis_error raw1_scan_read(
 	// compute how many bytes we would need to read up to the end of
 	// the current pixel line.
 	nb_pixels = buflen = private->params.width - private->w;
-	if (buflen % 8 != 0) {
-		buflen += 8 - (buflen % 8); // round up to upper 8 pixels multiple
-	}
+	buflen += private->pixels_padding_per_line;
+	assert(buflen % 8 == 0);
 	if (buflen > (*out_buffer_size / 3)) {
 		// buffer is too short --> can only read partial line
 		nb_pixels = buflen = (*out_buffer_size / 3);
@@ -310,7 +328,6 @@ static enum lis_error raw1_scan_read(
 
 	// compute how many bytes we have to read (8 pixels per byte)
 	// in input to get the expected number of pixels
-	assert(buflen % 8 == 0);
 	buflen /= 8;
 
 	lis_log_info("scan_read(): Input buffer = %lu B",
@@ -328,7 +345,6 @@ static enum lis_error raw1_scan_read(
 		return err;
 	}
 	assert(out_buflen <= buflen);
-
 
 	if (out_buflen < buflen) {
 		nb_pixels = out_buflen * 8;
@@ -354,8 +370,16 @@ static enum lis_error lis_raw24_scan_read(
 
 	switch(private->params.format) {
 		case LIS_IMG_FORMAT_RAW_RGB_24:
+			/* TODO(Jflesch):
+			 * take into account possible padding.
+			 * See private->bytes_padding_per_line
+			 */
 			break;
 		case LIS_IMG_FORMAT_GRAYSCALE_8:
+			/* TODO(Jflesch):
+			 * take into account possible padding.
+			 * See private->bytes_padding_per_line
+			 */
 			return raw8_scan_read(
 				private, out_buffer, buffer_size
 			);

@@ -13,8 +13,8 @@
 
 
 struct opt_value_mapping {
-	const char *original;
-	const char *replacement;
+	const char *original; /* case-sensitive ! */
+	const char *replacement; /* not case-sensitive */
 };
 
 struct opt_values_mapping {
@@ -48,6 +48,7 @@ static const struct opt_value_mapping g_opt_mode_mapping[] = {
 
 
 	// takes care of weird casing of 'LineArt'
+	{ .original = "Lineart", .replacement = OPT_VALUE_MODE_BW },
 	{ .original = "lineart", .replacement = OPT_VALUE_MODE_BW },
 
 	{ .original = NULL, .replacement = NULL },
@@ -89,7 +90,7 @@ static const struct opt_values_mapping *get_opt_mapping(const char *opt_name)
 {
 	int mapping_idx;
 	for (mapping_idx = 0 ; g_opt_values_mapping[mapping_idx].opt_name != NULL ; mapping_idx++) {
-		if (strcasecmp(g_opt_values_mapping[mapping_idx].opt_name, opt_name) == 0) {
+		if (strcmp(g_opt_values_mapping[mapping_idx].opt_name, opt_name) == 0) {
 			lis_log_debug("Mapping found for option '%s'", opt_name);
 			return &g_opt_values_mapping[mapping_idx];
 		}
@@ -109,7 +110,7 @@ static const struct opt_value_mapping *get_opt_original_value_mapping(const char
 	}
 
 	for (v_mapping = o_mapping->mapping ; v_mapping->original != NULL ; v_mapping++) {
-		if (strcasecmp(v_mapping->original, opt_value) == 0) {
+		if (strcmp(v_mapping->original, opt_value) == 0) {
 			lis_log_debug("Mapping found for option '%s' + value '%s'",
 				opt_name, opt_value);
 			return v_mapping;
@@ -137,7 +138,7 @@ static const struct opt_value_mapping *get_opt_modified_value_mapping(
 			continue;
 		}
 		for (constraint_idx = 0 ; constraint_idx < constraint->nb_values ; constraint_idx++) {
-			if (strcasecmp(v_mapping->original, constraint->values[constraint_idx].string) == 0) {
+			if (strcmp(v_mapping->original, constraint->values[constraint_idx].string) == 0) {
 				lis_log_debug("Mapping found for option '%s' + value '%s' (%s)",
 					opt_name, opt_value, v_mapping->original);
 				return v_mapping;

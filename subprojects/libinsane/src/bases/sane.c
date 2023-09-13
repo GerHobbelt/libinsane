@@ -511,9 +511,15 @@ static enum lis_error lis_sane_item_get_scan_parameters(
 
 	memset(out_p, 0, sizeof(struct lis_scan_parameters));
 
+	lis_log_info(
+		"%s->sane_get_parameters() returned:"
+		" format=%d, height=%d, width=%d, bytes_per_line=%d, depth=%d",
+		private->item->parent.name,
+		p.format, p.lines, p.pixels_per_line, p.bytes_per_line, p.depth
+	)
 	out_p->width = p.pixels_per_line;
 	out_p->height = p.lines;
-	out_p->image_size = out_p->width * out_p->height;
+	out_p->image_size = p.bytes_per_line * p.lines;
 	/* ignore p.last_frame */
 
 	switch(p.format) {
@@ -526,7 +532,6 @@ static enum lis_error lis_sane_item_get_scan_parameters(
 			break;
 		case SANE_FRAME_RGB:
 			out_p->format = LIS_IMG_FORMAT_RAW_RGB_24;
-			out_p->image_size *= 3;
 			break;
 		case SANE_FRAME_RED:
 		case SANE_FRAME_GREEN:
@@ -803,13 +808,14 @@ static int lis_sane_check_opt_descriptor(const char *item_name, int opt_idx,
 
 failed:
 	lis_log_warning(
-		"Device [%s]: Invalid or unsupported option descriptor [%s](%d ; [%s] ; [%s])."
+		"Device [%s]: Invalid or unsupported option descriptor [%s](%d ; [%s] ; [%s] ; [%d])."
 		" Ignored",
 		item_name,
 		sane_desc->name != NULL ? sane_desc->name : "(null)",
 		opt_idx,
 		sane_desc->title != NULL ? sane_desc->title : "(null)",
-		sane_desc->desc != NULL ? sane_desc->desc : "(null)"
+		sane_desc->desc != NULL ? sane_desc->desc : "(null)",
+		sane_desc->type
 	);
 	return 0;
 }

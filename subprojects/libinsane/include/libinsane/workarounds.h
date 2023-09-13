@@ -237,6 +237,25 @@ extern enum lis_error lis_api_workaround_lamp(
 );
 
 
+/*!
+ * \brief Retuns TRUE to end_of_feed on invalid page size
+ *
+ * - API: Sane
+ * - Culprits: Brother ADS-1200 + Brother DS-740D
+ * (probably on feeder only)
+ *
+ * When calling sane_start(), the Brother backend reports there is a next
+ * page. But when requesting the page size, we get something absurd like
+ * 2500x0.
+ *
+ * This workaround makes sure that when it happens, end_of_feed() is correctly
+ * reported.
+ */
+extern enum lis_error lis_api_workaround_invalid_page_size(
+	struct lis_api *to_wrap, struct lis_api **out_impl
+);
+
+
 #ifdef __cplusplus
 }
 #endif
