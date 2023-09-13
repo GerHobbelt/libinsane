@@ -91,7 +91,7 @@ static enum lis_error scan_read(
 			" (remaining: %lu B",
 			(long unsigned)bufsize
 		);
-		return LIS_ERR_INTERNAL_IMG_FORMAT_NOT_SUPPORTED;
+		return LIS_ERR_IO_ERROR;
 	}
 	return LIS_OK;
 }
@@ -359,7 +359,7 @@ static enum lis_error lis_bmp2raw_scan_read(
 	);
 	lis_log_debug(
 		"scan_read(): Reducing read from %ld B to %ld B",
-		(long)(*buffer_size), (long)initial
+		(long)initial, (long)(*buffer_size)
 	);
 	err = private->wrapped->scan_read(
 		private->wrapped, out_buffer, buffer_size
