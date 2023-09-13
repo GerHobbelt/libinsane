@@ -15,27 +15,27 @@
 static const struct lis_wia2lis_possibles g_possible_formats[] = {
 	{
 		.wia.clsid = &WiaImgFmt_BMP,
-		.lis.string = "bmp",
+		.lis.format = LIS_IMG_FORMAT_BMP,
 	},
 	{
 		.wia.clsid = &WiaImgFmt_CIFF,
-		.lis.string = "ciff",
+		.lis.format = LIS_IMG_FORMAT_CIFF,
 	},
 	{
 		.wia.clsid = &WiaImgFmt_EXIF,
-		.lis.string = "exif",
+		.lis.format = LIS_IMG_FORMAT_EXIF,
 	},
 	{
 		.wia.clsid = &WiaImgFmt_FLASHPIX,
-		.lis.string = "flashpix",
+		.lis.format = LIS_IMG_FORMAT_FLASHPIX,
 	},
 	{
 		.wia.clsid = &WiaImgFmt_GIF,
-		.lis.string = "gif",
+		.lis.format = LIS_IMG_FORMAT_GIF,
 	},
 	{
 		.wia.clsid = &WiaImgFmt_ICO,
-		.lis.string = "ico",
+		.lis.format = LIS_IMG_FORMAT_ICO,
 	},
 	/* TODO
 	{
@@ -45,19 +45,19 @@ static const struct lis_wia2lis_possibles g_possible_formats[] = {
 	*/
 	{
 		.wia.clsid = &WiaImgFmt_JPEG,
-		.lis.string = "jpeg",
+		.lis.format = LIS_IMG_FORMAT_JPEG,
 	},
 	{
 		.wia.clsid = &WiaImgFmt_JPEG2K,
-		.lis.string = "jpeg2k",
+		.lis.format = LIS_IMG_FORMAT_JPEG2K,
 	},
 	{
 		.wia.clsid = &WiaImgFmt_JPEG2KX,
-		.lis.string = "jpeg2kx",
+		.lis.format = LIS_IMG_FORMAT_JPEG2KX,
 	},
 	{
 		.wia.clsid = &WiaImgFmt_MEMORYBMP,
-		.lis.string = "memorybmp",
+		.lis.format = LIS_IMG_FORMAT_MEMORYBMP,
 	},
 	/* TODO
 	{
@@ -67,15 +67,15 @@ static const struct lis_wia2lis_possibles g_possible_formats[] = {
 	*/
 	{
 		.wia.clsid = &WiaImgFmt_PHOTOCD,
-		.lis.string = "photocd",
+		.lis.format = LIS_IMG_FORMAT_PHOTOCD,
 	},
 	{
 		.wia.clsid = &WiaImgFmt_PICT,
-		.lis.string = "pict",
+		.lis.format = LIS_IMG_FORMAT_PICT,
 	},
 	{
 		.wia.clsid = &WiaImgFmt_PNG,
-		.lis.string = "png",
+		.lis.format = LIS_IMG_FORMAT_PNG,
 	},
 	/* TODO
 	{
@@ -85,11 +85,11 @@ static const struct lis_wia2lis_possibles g_possible_formats[] = {
 	*/
 	{
 		.wia.clsid = &WiaImgFmt_RAWRGB,
-		.lis.string = "rawrgb",
+		.lis.format = LIS_IMG_FORMAT_RAW_RGB_24,
 	},
 	{
 		.wia.clsid = &WiaImgFmt_TIFF,
-		.lis.string = "tiff",
+		.lis.format = LIS_IMG_FORMAT_TIFF,
 	},
 	{ .eol = 1 },
 };
@@ -140,7 +140,7 @@ static const struct lis_wia2lis_possibles g_possible_document_handling_select[] 
 };
 
 
-static const struct lis_wia2lis_possibles g_possible_previews[] = {
+static const struct lis_wia2lis_possibles g_possible_preview_types[] = {
 	{
 		.wia.integer = LIS_WIA_ADVANCED_PREVIEW,
 		.lis.string = "advanced",
@@ -148,6 +148,19 @@ static const struct lis_wia2lis_possibles g_possible_previews[] = {
 	{
 		.wia.integer = LIS_WIA_BASIC_PREVIEW,
 		.lis.string = "basic",
+	},
+	{ .eol = 1 },
+};
+
+
+static const struct lis_wia2lis_possibles g_possible_previews[] = {
+	{
+		.wia.integer = WIA_FINAL_SCAN,
+		.lis.string = "final",
+	},
+	{
+		.wia.integer = WIA_PREVIEW_SCAN,
+		.lis.string = "preview",
 	},
 	{ .eol = 1 },
 };
@@ -343,16 +356,20 @@ static const struct lis_wia2lis_property g_wia2lis_properties[] = {
 				.lis.string = "write",
 			},
 			{
+				.wia.integer = WIA_ITEM_READ | WIA_ITEM_WRITE,
+				.lis.string = "read,write",
+			},
+			{
 				.wia.integer = WIA_ITEM_CAN_BE_DELETED,
 				.lis.string = "can_be_deleted",
 			},
 			{
 				.wia.integer = WIA_ITEM_RD,
-				.lis.string = "read_can_be_deleted",
+				.lis.string = "read,can_be_deleted",
 			},
 			{
 				.wia.integer = WIA_ITEM_RWD,
-				.lis.string = "read_write_can_be_deleted",
+				.lis.string = "read,write,can_be_deleted",
 			},
 			{ .eol = 1 },
 		},
@@ -533,7 +550,7 @@ static const struct lis_wia2lis_property g_wia2lis_properties[] = {
 		.line = __LINE__,
 		.item_type = LIS_PROPERTY_ITEM,
 		.wia = { .id = WIA_IPA_FORMAT, .type = VT_CLSID, },
-		.lis = { .name = "format", .type = LIS_TYPE_STRING, },
+		.lis = { .name = "format", .type = LIS_TYPE_IMAGE_FORMAT, },
 		.possibles = g_possible_formats
 	},
 
@@ -541,7 +558,10 @@ static const struct lis_wia2lis_property g_wia2lis_properties[] = {
 		.line = __LINE__,
 		.item_type = LIS_PROPERTY_ITEM,
 		.wia = { .id = WIA_IPA_PREFERRED_FORMAT, .type = VT_CLSID, },
-		.lis = { .name = "preferred_format", .type = LIS_TYPE_STRING, },
+		.lis = {
+			.name = "preferred_format",
+			.type = LIS_TYPE_IMAGE_FORMAT,
+		},
 		.possibles = g_possible_formats
 	},
 
@@ -1723,7 +1743,7 @@ static const struct lis_wia2lis_property g_wia2lis_properties[] = {
 		.item_type = LIS_PROPERTY_ITEM,
 		.wia = { .id = LIS_WIA_IPS_PREVIEW_TYPE, .type = VT_I4, },
 		.lis = { .name = "preview_type", .type = LIS_TYPE_STRING },
-		.possibles = g_possible_previews,
+		.possibles = g_possible_preview_types,
 	},
 
 	{
@@ -1910,21 +1930,28 @@ enum lis_error lis_wia2lis_get_possibles(
 	)
 {
 	int i;
+	int nb_values;
 	lis_log_debug("Getting possible values for option '%s'", in_wia2lis->lis.name);
-	assert(in_wia2lis->lis.type == LIS_TYPE_STRING);
 
-	for (i = 0 ; !in_wia2lis->possibles[i].eol ; i++) { }
+	for (nb_values = 0 ; !in_wia2lis->possibles[nb_values].eol ; nb_values++) { }
 
-	out_list->values = calloc(i, sizeof(union lis_value));
+	out_list->values = calloc(nb_values, sizeof(union lis_value));
 	if (out_list->values == NULL) {
 		lis_log_error("Out of memory");
 		return LIS_ERR_NO_MEM;
 	}
 
-	out_list->nb_values = i;
+	out_list->nb_values = nb_values;
 
 	for (i = 0 ; !in_wia2lis->possibles[i].eol ; i++) {
-		out_list->values[i].string = in_wia2lis->possibles[i].lis.string;
+		if (in_wia2lis->lis.type == LIS_TYPE_STRING) {
+			out_list->values[i].string = strdup(in_wia2lis->possibles[i].lis.string);
+		} else {
+			memcpy(
+				&out_list->values[i], &in_wia2lis->possibles[i].lis,
+				sizeof(out_list->values[i])
+			);
+		}
 	}
 
 	return LIS_OK;
@@ -1992,8 +2019,23 @@ enum lis_error lis_wia2lis_get_list(
 				return LIS_ERR_NO_MEM;
 			}
 			out_list->nb_values = in_propvariant.cal.cElems;
-			for (i = 0 ; i < in_propvariant.cal.cElems ; i++) {
-				out_list->values[i].integer = in_propvariant.cal.pElems[i];
+			/*
+			 * XXX(Jflesch):
+			 * Integer lists are prefixed with 2 elements:
+			 * number of elements in the list + default value.
+			 * We need none of them here.
+			 */
+			if (out_list->nb_values <= 2) {
+				lis_log_warning(
+					"Expected at least 3 values in integer list, got %d",
+					out_list->nb_values
+				);
+				out_list->nb_values = 0;
+			} else {
+				out_list->nb_values -= 2;
+			}
+			for (i = 2 ; i < in_propvariant.cal.cElems ; i++) {
+				out_list->values[i - 2].integer = in_propvariant.cal.pElems[i];
 			}
 			return LIS_OK;
 		case VT_BSTR:
@@ -2031,3 +2073,224 @@ const struct lis_wia2lis_property *lis_get_all_properties(
 	*nb_properties = LIS_COUNT_OF(g_wia2lis_properties);
 	return g_wia2lis_properties;
 }
+
+
+static enum lis_error convert_wia_int2lis(
+		const struct lis_wia2lis_property *wia2lis,
+		long wia_int,
+		union lis_value *value
+	)
+{
+	int i;
+
+	if (wia2lis->possibles != NULL) {
+		for (i = 0 ; !wia2lis->possibles[i].eol ; i++) {
+			if (wia2lis->possibles[i].wia.integer == wia_int) {
+				memcpy(value, &wia2lis->possibles[i].lis, sizeof(*value));
+				return LIS_OK;
+			}
+		}
+		lis_log_warning(
+			"Unknown value %ld for option %ld,%s",
+			wia_int, wia2lis->wia.id, wia2lis->lis.name
+		);
+		return LIS_ERR_UNSUPPORTED;
+	}
+
+	if (wia2lis->lis.type != LIS_TYPE_INTEGER) {
+		lis_log_warning(
+			"Don't know how to convert option '%s' value"
+			" from integer to type %d",
+			wia2lis->lis.name, wia2lis->lis.type
+		);
+		return LIS_ERR_UNSUPPORTED;
+	}
+
+	value->integer = wia_int;
+	return LIS_OK;
+}
+
+
+static enum lis_error convert_wia_clsid2lis(
+		const struct lis_wia2lis_property *wia2lis,
+		const CLSID *clsid,
+		union lis_value *value
+	)
+{
+	int i;
+	LPOLESTR str;
+	char *cstr;
+	HRESULT hr;
+
+	if (wia2lis->possibles == NULL) {
+		lis_log_warning(
+			"Don't know how to convert option '%s' value"
+			" from clsid to type %d",
+			wia2lis->lis.name, wia2lis->lis.type
+		);
+		return LIS_ERR_UNSUPPORTED;
+	}
+
+	for (i = 0 ; !wia2lis->possibles[i].eol ; i++) {
+		if (memcmp(wia2lis->possibles[i].wia.clsid, clsid, sizeof(*clsid)) == 0) {
+			memcpy(value, &wia2lis->possibles[i].lis, sizeof(*value));
+			return LIS_OK;
+		}
+	}
+
+	hr = StringFromCLSID(clsid, &str);
+	if (FAILED(hr)) {
+		lis_log_error("Out of memory");
+		return LIS_ERR_NO_MEM;
+	}
+
+	cstr = lis_bstr2cstr(str);
+	CoTaskMemFree(str);
+	if (cstr == NULL) {
+		lis_log_error("Out of memory");
+		return LIS_ERR_NO_MEM;
+	}
+
+	lis_log_warning(
+		"Unknown value CLSID %s for option %ld,%s",
+		cstr, wia2lis->wia.id, wia2lis->lis.name
+	);
+	FREE(cstr);
+	return LIS_ERR_UNSUPPORTED;
+}
+
+
+enum lis_error lis_convert_wia2lis(
+		const struct lis_wia2lis_property *wia2lis,
+		const PROPVARIANT *propvariant,
+		union lis_value *value,
+		char **allocated
+	)
+{
+	FREE(*allocated);
+
+	switch(wia2lis->wia.type) {
+		case VT_I4:
+			return convert_wia_int2lis(
+				wia2lis, propvariant->lVal, value
+			);
+		case VT_CLSID:
+			return convert_wia_clsid2lis(
+				wia2lis, propvariant->puuid, value
+			);
+		case VT_BSTR:
+			value->string = (*allocated) = lis_bstr2cstr(propvariant->bstrVal);
+			if (value->string == NULL) {
+				lis_log_error("Out of memory");
+				return LIS_ERR_NO_MEM;
+			}
+			return LIS_OK;
+	}
+
+	lis_log_warning(
+		"Failed to convert from WIA type %d to Libinsane type %d",
+		wia2lis->wia.type, wia2lis->lis.type
+	);
+	return LIS_ERR_UNSUPPORTED;
+}
+
+
+static enum lis_error convert_lis_str2wia(
+		const struct lis_wia2lis_property *wia2lis,
+		const char *in_value,
+		PROPVARIANT *out_propvariant
+	)
+{
+	int i;
+
+	if (wia2lis->possibles != NULL) {
+		for (i = 0 ; !wia2lis->possibles[i].eol ; i++) {
+			if (strcasecmp(
+						wia2lis->possibles[i].lis.string,
+						in_value
+					) == 0) {
+	
+				switch (wia2lis->wia.type) {
+					case VT_I4:
+						PropVariantInit(out_propvariant);
+						out_propvariant->vt = VT_I4;
+						out_propvariant->lVal = wia2lis->possibles[i].wia.integer;
+						return LIS_OK;
+					case VT_CLSID:
+						PropVariantInit(out_propvariant);
+						out_propvariant->vt = VT_CLSID;
+						out_propvariant->puuid = CoTaskMemAlloc(
+							sizeof(CLSID)
+						);
+						if (out_propvariant->puuid == NULL) {
+							lis_log_error("Out of memory");
+							return LIS_ERR_NO_MEM;
+						}
+						memcpy(
+							out_propvariant->puuid,
+							wia2lis->possibles[i].wia.clsid,
+							sizeof(CLSID)
+						);
+						return LIS_OK;
+					default:
+						lis_log_warning(
+							"Don't know how to convert from Libinsane string"
+							" to WIA type %d (possibles)",
+							wia2lis->wia.type
+						);
+						return LIS_ERR_UNSUPPORTED;
+				}
+			}
+		}
+		return LIS_ERR_INVALID_VALUE;
+	}
+	
+	PropVariantInit(out_propvariant);
+	out_propvariant->vt = VT_BSTR;
+	out_propvariant->bstrVal = lis_cstr2bstr(in_value);
+	if (out_propvariant->bstrVal == NULL) {
+		return LIS_ERR_NO_MEM;
+	}
+	return LIS_OK;
+}
+
+
+static enum lis_error convert_lis_int2wia(
+		const struct lis_wia2lis_property *wia2lis,
+		int in_value,
+		PROPVARIANT *out_propvariant
+	)
+{
+	LIS_UNUSED(wia2lis);
+
+	PropVariantInit(out_propvariant);
+	out_propvariant->vt = VT_I4;
+	out_propvariant->lVal = in_value;
+	return LIS_OK;
+}
+
+
+enum lis_error lis_convert_lis2wia(
+		const struct lis_wia2lis_property *wia2lis,
+		union lis_value in_value,
+		PROPVARIANT *out_propvariant
+	)
+{
+	switch(wia2lis->lis.type) {
+		case LIS_TYPE_STRING:
+			return convert_lis_str2wia(wia2lis, in_value.string, out_propvariant);
+		case LIS_TYPE_INTEGER:
+			return convert_lis_int2wia(wia2lis, in_value.integer, out_propvariant);
+		case LIS_TYPE_BOOL:
+		case LIS_TYPE_DOUBLE:
+		case LIS_TYPE_IMAGE_FORMAT:
+			break;
+	}
+	
+	lis_log_warning(
+		"Failed to convert from Libinsane type %d to WIA type %d",
+		wia2lis->lis.type, wia2lis->wia.type
+	);
+	return LIS_ERR_UNSUPPORTED;
+}
+
