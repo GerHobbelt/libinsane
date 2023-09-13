@@ -40,30 +40,6 @@ static const struct {
 		.enabled_by_default = 1,
 	},
 	{
-		.name = "normalizer_source_nodes",
-		.env = "LIBINSANE_NORMALIZER_SOURCE_NODES",
-		.wrap_cb = lis_api_normalizer_source_nodes,
-		.enabled_by_default = 1,
-	},
-	{
-		.name = "normalizer_min_one_source",
-		.env = "LIBINSANE_NORMALIZER_MIN_ONE_SOURCE",
-		.wrap_cb = lis_api_normalizer_min_one_source,
-		.enabled_by_default = 1,
-	},
-	{
-		.name = "normalizer_all_opts_on_all_sources",
-		.env = "LIBINSANE_NORMALIZER_ALL_OPTS_ON_ALL_SOURCES",
-		.wrap_cb = lis_api_normalizer_all_opts_on_all_sources,
-		.enabled_by_default = 1,
-	},
-	{
-		.name = "normalizer_source_names",
-		.env = "LIBINSANE_NORMALIZER_SOURCE_NAMES",
-		.wrap_cb = lis_api_normalizer_source_names,
-		.enabled_by_default = 1,
-	},
-	{
 		.name = "normalizer_opt_aliases",
 		.env = "LIBINSANE_NORMALIZER_OPT_ALIASES",
 		.wrap_cb = lis_api_normalizer_opt_aliases,
@@ -112,6 +88,36 @@ static const struct {
 		.enabled_by_default = 1,
 	},
 	{
+		.name = "normalizer_clean_dev_descs",
+		.env = "LIBINSANE_NORMALIZER_CLEAN_DEV_DESCS",
+		.wrap_cb = lis_api_normalizer_clean_dev_descs,
+		.enabled_by_default = 1,
+	},
+	{
+		.name = "normalizer_safe_defaults",
+		.env = "LIBINSANE_NORMALIZER_SAFE_DEFAULTS",
+		.wrap_cb = lis_api_normalizer_safe_defaults,
+		.enabled_by_default = 1,
+	},
+	{
+		.name = "normalizer_source_nodes",
+		.env = "LIBINSANE_NORMALIZER_SOURCE_NODES",
+		.wrap_cb = lis_api_normalizer_source_nodes,
+		.enabled_by_default = 1,
+	},
+	{
+		.name = "normalizer_min_one_source",
+		.env = "LIBINSANE_NORMALIZER_MIN_ONE_SOURCE",
+		.wrap_cb = lis_api_normalizer_min_one_source,
+		.enabled_by_default = 1,
+	},
+	{
+		.name = "normalizer_source_names",
+		.env = "LIBINSANE_NORMALIZER_SOURCE_NAMES",
+		.wrap_cb = lis_api_normalizer_source_names,
+		.enabled_by_default = 1,
+	},
+	{
 		.name = "normalizer_source_types",
 		.env = "LIBINSANE_NORMALIZER_SOURCE_TYPES",
 		.wrap_cb = lis_api_normalizer_source_types,
@@ -124,15 +130,9 @@ static const struct {
 		.enabled_by_default = 1,
 	},
 	{
-		.name = "normalizer_clean_dev_descs",
-		.env = "LIBINSANE_NORMALIZER_CLEAN_DEV_DESCS",
-		.wrap_cb = lis_api_normalizer_clean_dev_descs,
-		.enabled_by_default = 1,
-	},
-	{
-		.name = "normalizer_safe_defaults",
-		.env = "LIBINSANE_NORMALIZER_SAFE_DEFAULTS",
-		.wrap_cb = lis_api_normalizer_safe_defaults,
+		.name = "normalizer_all_opts_on_all_sources",
+		.env = "LIBINSANE_NORMALIZER_ALL_OPTS_ON_ALL_SOURCES",
+		.wrap_cb = lis_api_normalizer_all_opts_on_all_sources,
 		.enabled_by_default = 1,
 	},
 	{	// dedicated thread wrapper should be loaded last

@@ -77,12 +77,41 @@ char *lis_propvariant2char(PROPVARIANT *prop)
 }
 
 
+static void print_unknown_hresult(HRESULT hr) {
+	LPTSTR errorText = NULL;
+
+	FormatMessage(
+		FORMAT_MESSAGE_FROM_SYSTEM
+		| FORMAT_MESSAGE_ALLOCATE_BUFFER
+		| FORMAT_MESSAGE_IGNORE_INSERTS,
+		NULL,
+		hr,
+		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+		(LPTSTR)&errorText, 0,
+		NULL
+	);
+
+	if (errorText == NULL)
+	{
+		lis_log_error("Unknown Windows error code: 0x%lX", hr);
+	} else {
+		lis_log_error("Unknown Windows error code: 0x%lX, %s", hr, errorText);
+		LocalFree(errorText);
+		errorText = NULL;
+	}
+}
+
 enum lis_error hresult_to_lis_error(HRESULT hr) {
 	switch (hr) {
 		case S_OK: return LIS_OK;
 
 		/* code we get when calling get_device() with an invalid ID */
 		case WIA_S_NO_DEVICE_AVAILABLE: return LIS_ERR_INVALID_VALUE;
+		case WIA_ERROR_PAPER_JAM: return LIS_ERR_JAMMED;
+		case WIA_ERROR_PAPER_PROBLEM: return LIS_ERR_JAMMED;
+		case WIA_ERROR_BUSY: return LIS_ERR_DEVICE_BUSY;
+		case WIA_ERROR_WARMING_UP: return LIS_WARMING_UP;
+		case WIA_ERROR_DEVICE_LOCKED: return LIS_ERR_HW_IS_LOCKED;
 
 		case E_INVALIDARG: return LIS_ERR_INVALID_VALUE;
 		case E_NOTIMPL: return LIS_ERR_INTERNAL_NOT_IMPLEMENTED;
@@ -94,9 +123,7 @@ enum lis_error hresult_to_lis_error(HRESULT hr) {
 			);
 			break;
 		default:
-			lis_log_warning(
-				"Unknown Windows error code: 0x%lX", hr
-			);
+			print_unknown_hresult(hr);
 			break;
 	}
 
