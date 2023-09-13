@@ -43,7 +43,9 @@ struct lis_sn_device_private
 	int nb_sources;
 	struct lis_item **source_ptrs;
 	struct lis_sn_item_private *sources;
+
 	int scan_running;
+	struct lis_sn_scan_session_private *scan_session;
 };
 #define LIS_SN_DEVICE_PRIVATE(item) ((struct lis_sn_device_private *)(item))
 
@@ -64,7 +66,7 @@ static enum lis_error lis_sn_scan_read(
 );
 static void lis_sn_cancel(struct lis_scan_session *session);
 
-struct lis_scan_session g_sn_scan_session_template = {
+static const struct lis_scan_session g_sn_scan_session_template = {
 	.end_of_feed = lis_sn_end_of_feed,
 	.end_of_page = lis_sn_end_of_page,
 	.scan_read = lis_sn_scan_read,
@@ -72,7 +74,7 @@ struct lis_scan_session g_sn_scan_session_template = {
 };
 
 
-static enum lis_error lis_sn_get_options(
+static enum lis_error lis_sn_dev_get_options(
 	struct lis_item *self, struct lis_option_descriptor ***descs
 );
 
@@ -88,7 +90,7 @@ static const struct lis_item g_sn_dev_template = {
 	.name = NULL,
 	.type = LIS_ITEM_UNIDENTIFIED,
 	.get_children = lis_sn_dev_get_children,
-	.get_options = lis_sn_get_options,
+	.get_options = lis_sn_dev_get_options,
 	/* we have to let get_scan_parameters() and scan_start() work on the root node
 	 * as well, otherwise the normalizer 'min_one_source' can't work
 	 */
@@ -99,6 +101,9 @@ static const struct lis_item g_sn_dev_template = {
 
 
 static enum lis_error lis_sn_src_get_children(struct lis_item *self, struct lis_item ***children);
+static enum lis_error lis_sn_src_get_options(
+	struct lis_item *self, struct lis_option_descriptor ***descs
+);
 static void lis_sn_src_close(struct lis_item *self);
 
 
@@ -106,7 +111,7 @@ static const struct lis_item g_sn_source_template = {
 	.name = NULL,
 	.type = LIS_ITEM_UNIDENTIFIED,
 	.get_children = lis_sn_src_get_children,
-	.get_options = lis_sn_get_options,
+	.get_options = lis_sn_src_get_options,
 	.get_scan_parameters = lis_sn_get_scan_parameters,
 	.scan_start = lis_sn_scan_start,
 	.close = lis_sn_src_close,
@@ -225,12 +230,25 @@ static enum lis_error lis_sn_dev_get_children(struct lis_item *self, struct lis_
 }
 
 
-static enum lis_error lis_sn_get_options(
+static enum lis_error lis_sn_dev_get_options(
 		struct lis_item *self, struct lis_option_descriptor ***descs
-		)
+	)
 {
 	struct lis_sn_item_private *private = LIS_SN_ITEM_PRIVATE(self);
 	return private->device->wrapped->get_options(private->device->wrapped, descs);
+}
+
+
+static enum lis_error lis_sn_src_get_options(
+		struct lis_item *self, struct lis_option_descriptor ***out_descs
+	)
+{
+	// do not return any option ; that would be redundant with normalizer
+	// 'all_opts_on_all_sources'
+	static const struct lis_option_descriptor *descs[] = { NULL };
+	LIS_UNUSED(self);
+	*out_descs = (struct lis_option_descriptor **)descs;
+	return LIS_OK;
 }
 
 
@@ -300,21 +318,43 @@ static enum lis_error lis_sn_get_scan_parameters(
 
 static enum lis_error lis_sn_scan_start(struct lis_item *self, struct lis_scan_session **session)
 {
-	struct lis_sn_item_private *private = LIS_SN_ITEM_PRIVATE(self);
+	struct lis_sn_item_private *private_item = LIS_SN_ITEM_PRIVATE(self);
+	struct lis_sn_scan_session_private *private_session;
 	enum lis_error err;
 
-	err = set_source(private);
+	if (private_item->device->scan_running) {
+		lis_log_error("scan_start() called while a scan session is already running");
+		return LIS_ERR_DEVICE_BUSY;
+	}
+	FREE(private_item->device->scan_session);
+
+	err = set_source(private_item);
 	if (LIS_IS_ERROR(err)) {
 		lis_log_error("Setting source has failed --> scan_start() failed: 0x%X, %s",
 				err, lis_strerror(err));
 		return err;
 	}
-	err = private->device->wrapped->scan_start(private->device->wrapped, session);
+
+	private_session = calloc(1, sizeof(struct lis_sn_scan_session_private));
+	if (private_session == NULL) {
+		lis_log_error("Out of memory");
+		return LIS_ERR_NO_MEM;
+	}
+
+	err = private_item->device->wrapped->scan_start(private_item->device->wrapped, &private_session->wrapped);
 	if (LIS_IS_ERROR(err)) {
+		FREE(private_session);
 		lis_log_error("Failed to set source: 0x%X, %s", err, lis_strerror(err));
 		return err;
 	}
-	private->device->scan_running = 1;
+
+	memcpy(&private_session->parent, &g_sn_scan_session_template, sizeof(private_session->parent));
+	private_session->device = private_item->device;
+
+	private_item->device->scan_running = 1;
+	private_item->device->scan_session = private_session;
+
+	*session = &private_session->parent;
 	return err;
 }
 
@@ -330,6 +370,7 @@ static void lis_sn_dev_close(struct lis_item *self)
 	struct lis_sn_device_private *private = LIS_SN_DEVICE_PRIVATE(self);
 	FREE(private->source_ptrs);
 	FREE(private->sources);
+	FREE(private->scan_session);
 	private->wrapped->close(private->wrapped);
 	free(private);
 }

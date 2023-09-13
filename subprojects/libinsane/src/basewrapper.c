@@ -387,10 +387,7 @@ static enum lis_error lis_bw_item_get_children(struct lis_item *self, struct lis
 			private->children[i]->parent.type = to_wrap[i]->type;
 			private->children[i]->impl = private->impl;
 
-			if (private->impl->item_filter.cb == NULL) {
-				lis_log_info("%s: No item filter defined. Returning child item as is.",
-						private->impl->wrapper_name);
-			} else {
+			if (private->impl->item_filter.cb != NULL) {
 				err = private->impl->item_filter.cb(
 					&private->children[i]->parent, 0 /* !root */,
 					private->impl->item_filter.user_data
@@ -424,7 +421,7 @@ static enum lis_error lis_bw_item_get_options(
 		return err;
 	}
 	if(private->impl->opt_desc_filter.cb == NULL) {
-		lis_log_info("%s: No option filter defined. Returning options as is.",
+		lis_log_debug("%s: No option filter defined. Returning options as is.",
 			private->impl->wrapper_name);
 		*descs = opts;
 		return err;

@@ -59,6 +59,12 @@ static const struct {
 		.enabled_by_default = 1,
 	},
 	{
+		.name = "normalizer_all_opts_on_all_sources",
+		.env = "LIBINSANE_NORMALIZER_ALL_OPTS_ON_ALL_SOURCES",
+		.wrap_cb = lis_api_normalizer_all_opts_on_all_sources,
+		.enabled_by_default = 1,
+	},
+	{
 		.name = "normalizer_source_names",
 		.env = "LIBINSANE_NORMALIZER_SOURCE_NAMES",
 		.wrap_cb = lis_api_normalizer_source_names,
@@ -77,9 +83,9 @@ static const struct {
 		.enabled_by_default = 1,
 	},
 	{
-		.name = "normalizer_safe_defaults",
-		.env = "LIBINSANE_NORMALIZER_SAFE_DEFAULTS",
-		.wrap_cb = lis_api_normalizer_safe_defaults,
+		.name = "normalizer_resolution",
+		.env = "LIBINSANE_NORMALIZER_RESOLUTION",
+		.wrap_cb = lis_api_normalizer_resolution,
 		.enabled_by_default = 1,
 	},
 	{
@@ -89,15 +95,15 @@ static const struct {
 		.enabled_by_default = 1,
 	},
 	{
-		.name = "normalizer_resolution",
-		.env = "LIBINSANE_NORMALIZER_RESOLUTION",
-		.wrap_cb = lis_api_normalizer_resolution,
-		.enabled_by_default = 1,
-	},
-	{
 		.name = "normalizer_clean_dev_descs",
 		.env = "LIBINSANE_NORMALIZER_CLEAN_DEV_DESCS",
 		.wrap_cb = lis_api_normalizer_clean_dev_descs,
+		.enabled_by_default = 1,
+	},
+	{
+		.name = "normalizer_safe_defaults",
+		.env = "LIBINSANE_NORMALIZER_SAFE_DEFAULTS",
+		.wrap_cb = lis_api_normalizer_safe_defaults,
 		.enabled_by_default = 1,
 	},
 };
