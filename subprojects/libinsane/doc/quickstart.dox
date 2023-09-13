@@ -8,33 +8,37 @@ Makefiles in all [OpenPaper.work](https://openpaper.work) projects present simil
 - make install : install libinsane + libinsane-gobject
 - make doc : generate the documentation (doxygen for libinsane, and gtk-doc for libinsane-gobject)
 
-# Compilation
+
+# Build dependencies
+
+\ref dependencies
+
+
+# System-wide installation
 
 ```
-sudo apt install \
-        meson \
-        gtk-doc-tools doxygen plantuml graphviz \
-        build-essential \
-        libsane-dev \
-        libgirepository1.0-dev gobject-introspection \
-        libcunit1-ncurses-dev \
-        valgrind
-make
+sudo make install  # will install files in /usr/local
 ```
 
-# Installation
-
-## For use in a C project
+or
 
 ```
-make install
+sudo make install PREFIX=/usr  # will install files in /usr
 ```
 
-Will install the headers in /usr/local/include/libinsane.
-Will install dynamic (libinsane.so) and static library (libinsane.a) in /usr/local/lib.
+
+# Uninstalling
+
+Depending on your version of Meson/Ninja, the following may or may not work:
+
+```
+sudo make uninstall
+```
 
 
-# Usage
+# Using it in C
+
+## Usage
 
 ## In a C project
 
@@ -140,23 +144,34 @@ end:
 }
 ```
 
-## In a project in any other programming language
+## Using it with any other programming language
 
-### Environment variables
+### Letting GObject Introspection find the library
 
 By default, `make install` installs everything in `/usr/local`. However
-by default, gobject-introspection looks only in `/usr`. So there are some
+by default, gobject-introspection looks only in `/usr`. So either you
+install Libinsane in /usr (not recommended) or there are some
 environment variables to define:
 
 ```
-# Set some variables. For instance:
+# For instance:
 # export LD_LIBRARY_PATH=/usr/local/lib/x86_64-linux-gnu
 # export GI_TYPELIB_PATH=/usr/local/lib/x86_64-linux-gnu/girepository-1.0
+```
 
-# or use this script: it will compile libinsane in the current work directory
-# and use this freshly compiled version.
+### Not installing Libinsane system-wide
+
+When using Libinsane through Gobject introspection, you can decide to *not*
+install it system-wide. If you prefer not installing it at all, there is a
+script available to define a development environment (similar to Python
+virtualenv):
+
+```
+# it will compile Libinsane in the current work directory
+# and use this freshly compiled version without installing it system-wide.
 source ./activate_test_env.sh
 ```
+
 
 ### Example: Python 3
 

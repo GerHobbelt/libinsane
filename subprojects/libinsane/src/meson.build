@@ -34,11 +34,15 @@ if host_machine.system() == 'windows'
         'bases/wia_automation.c',
         'bases/wia_ll.c',
     ]
+    deps += [
+        dependency('regex'),
+        dependency('iconv'),
+    ]
 else
     libinsane_srcs += [
         'bases/sane.c',
     ]
-    deps += dependency('sane-backends')
+    deps += [dependency('sane-backends')]
 endif
 
 libinsane = library('insane', libinsane_srcs,

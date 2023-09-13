@@ -82,6 +82,8 @@ enum lis_error lis_str2impls(const char *list_of_impls, struct lis_api **impls)
 				err = lis_api_normalizer_opt_aliases(*impls, &next);
 			} else if (strcmp(tok, "source_nodes") == 0) {
 				err = lis_api_normalizer_source_nodes(*impls, &next);
+			} else if (strcmp(tok, "source_names") == 0) {
+				err = lis_api_normalizer_source_names(*impls, &next);
 			} else if (strcmp(tok, "source_types") == 0) {
 				err = lis_api_normalizer_source_types(*impls, &next);
 			} else if (strcmp(tok, "safe_defaults") == 0) {
