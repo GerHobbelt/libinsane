@@ -2,9 +2,9 @@
 
 # make
 # sudo make install
-# export GI_TYPELIB_PATH=/usr/local/lib/girepository-1.0
-# export LD_LIBRARY_PATH=/usr/local/lib
-# libinsane-gobject/examples/list_options.py
+# export LD_LIBRARY_PATH=/usr/local/lib/x86_64-linux-gnu
+# export GI_TYPELIB_PATH=/usr/local/lib/x86_64-linux-gnu/girepository-1.0
+# subprojects/libinsane-gobject/examples/list_options.py
 
 import gi
 gi.require_version('Libinsane', '0.1')
@@ -16,7 +16,7 @@ from gi.repository import Libinsane  # noqa: E402
 class ExampleLogger(GObject.GObject, Libinsane.Logger):
     def do_log(self, lvl, msg):
         if lvl <= Libinsane.LogLevel.DEBUG:
-           return
+            return
         print("{}: {}".format(lvl.value_nick, msg))
 
 
@@ -53,6 +53,7 @@ def main():
                     print("|   |   |-- Value: (unavailable)")
         print("")
         dev.close()
+
 
 if __name__ == "__main__":
     main()
