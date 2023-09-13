@@ -13,6 +13,7 @@
 #include <libinsane/util.h>
 
 #include "../../bmp.h"
+#include "../../endianess.h"
 #include "capabilities.h"
 #include "twain.h"
 
@@ -2068,7 +2069,9 @@ static enum lis_error next_page(struct lis_twain_session *private)
 	err = twain_get_scan_parameters(&private->parent, &params);
 	assert(LIS_IS_OK(err));
 
-	lis_scan_params2bmp(&params, &private->img.header);
+	lis_scan_params2bmp(
+		&params, &private->img.header, private->img.infos.BitsPerPixel
+	);
 	partial_header_len = BMP_HEADER_SIZE - (
 		((char *)(&(private->img.header.remaining_header)))
 		- ((char *)(&(private->img.header)))
@@ -2078,20 +2081,40 @@ static enum lis_error next_page(struct lis_twain_session *private)
 		&(private->img.header.remaining_header),
 		private->img.mem, partial_header_len
 	);
+
+	// take into account a palette color if there is one
+	private->img.header.offset_to_data = htole32(
+		le32toh(private->img.header.offset_to_data)
+		+ (le32toh(private->img.header.nb_colors_in_palette) * 4)
+	);
+	private->img.header.file_size = htole32(
+		le32toh(private->img.header.file_size)
+		+ (le32toh(private->img.header.nb_colors_in_palette) * 4)
+	);
+
 	lis_hexdump(&private->img.header, BMP_HEADER_SIZE);
 
 	// From TWAIN example
 	// If the driver did not fill in the biSizeImage field, then compute it
 	// Each scan line of the image is aligned on a DWORD (32bit) boundary
-	if(private->img.header.pixel_data_size == 0) {
-		private->img.header.pixel_data_size = (
-			(((private->img.header.width
-				* private->img.header.nb_bits_per_pixel)
-				+ 31) & ~31) / 8)
-				* private->img.header.height;
+	if (private->img.header.pixel_data_size == 0
+			&& private->img.infos.BitsPerPixel >= 24) {
+		private->img.header.pixel_data_size = htole32(
+			(
+				(
+					(
+						(
+							le32toh(private->img.header.width)
+							* le16toh(private->img.header.nb_bits_per_pixel)
+						)
+						+ 31
+					) & ~31
+				) / 8
+			) * le32toh(private->img.header.height)
+		);
 		lis_log_warning(
 			"Missing pixel data size. Computed: %d",
-			private->img.header.pixel_data_size
+			le32toh(private->img.header.pixel_data_size)
 		);
 	}
 
@@ -2099,8 +2122,18 @@ static enum lis_error next_page(struct lis_twain_session *private)
 
 	private->img.header_size = BMP_HEADER_SIZE;
 	private->img.header_read = 0;
-	// TODO(Jflesch): endianess of BMP header
-	private->img.img_size = private->img.header.pixel_data_size;
+	if (private->img.header.pixel_data_size != 0) {
+		private->img.img_size = htole32(
+			le32toh(private->img.header.pixel_data_size)
+			+ (le32toh(private->img.header.nb_colors_in_palette) * 4)
+		);
+	} else {
+		private->img.img_size = htole32(
+			le32toh(private->img.header.file_size)
+			- le32toh(private->img.header.offset_to_data)
+			+ (le32toh(private->img.header.nb_colors_in_palette) * 4)
+		);
+	}
 	lis_log_info(
 		"Expecting %d bytes of data", private->img.img_size
 	);
@@ -2190,7 +2223,7 @@ static enum lis_error twain_get_scan_parameters(
 	parameters->image_size = (
 		private->img.infos.ImageWidth
 		* private->img.infos.ImageLength
-		* 3
+		* private->img.infos.BitsPerPixel / 8
 	);
 
 	lis_log_info("get_scan_parameters(): OK");
