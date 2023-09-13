@@ -20,10 +20,10 @@ LIBINSANE_SRCS = files(
     'safebet.c',
     'str2impls.c',
     'workarounds/dedicated_thread.c',
-    'workarounds/no_read_on_inactive_opt.c',
-    'workarounds/no_write_on_readonly_opt.c',
+    'workarounds/check_capabilities.c',
     'workarounds/opt_names.c',
     'workarounds/opt_values.c',
+    'util.c',
 )
 
 if host_machine.system() == 'windows'

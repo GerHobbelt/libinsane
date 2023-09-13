@@ -14,7 +14,7 @@ Work In Progress
   - [X] [min_one_source](https://doc.openpaper.work/libinsane/latest/libinsane/normalizers_8h.html#aeaab4354a3d7cac9d671772638c39645) (Sane, WIA)
   - [ ] [all_opts_on_all_sources](https://doc.openpaper.work/libinsane/latest/libinsane/normalizers_8h.html#af74c3b5b0f598b4da581b9005bddf888) (WIA)
   - [ ] [scan_area_opts](https://doc.openpaper.work/libinsane/latest/libinsane/normalizers_8h.html#a083c0198fa60e7432ed767bc7eec1ff6) (WIA)
-  - [X] resolution
+  - [X] [resolution](https://doc.openpaper.work/libinsane/latest/libinsane/normalizers_8h.html#a2d8204e4f237beec9eaeed1e81f86aab)
   - [X] [source_types](https://doc.openpaper.work/libinsane/latest/libinsane/normalizers_8h.html#a1a053e0afa1e078d4b4f7259d6ede3fb) (Sane)
   - [ ] [strip_non_scanners](https://doc.openpaper.work/libinsane/latest/libinsane/normalizers_8h.html#a6ad81b76fa1e382563696a4d48595c13) (Sane)
   - [ ] [raw](https://doc.openpaper.work/libinsane/latest/libinsane/normalizers_8h.html#a22994c0572bb0851582d7725ecb5706e) (WIA)
@@ -26,7 +26,5 @@ Work In Progress
 * Workarounds
   - [X] [opt_names](https://doc.openpaper.work/libinsane/latest/libinsane/workarounds_8h.html#a2b87714fe5739e8e479aa955a5b0bb93) (Sane)
   - [X] [opt values](https://doc.openpaper.work/libinsane/latest/libinsane/workarounds_8h.html#a5f3347627b2e65cc425d070701e78659) (Sane)
-  - [ ] [no_read_on_inactive_opt](https://doc.openpaper.work/libinsane/latest/libinsane/workarounds_8h.html#a27807718d306c89fd326637d5ef34b03) (Sane, WIA)
-  - [ ] [no_write_on_readonly_opt](https://doc.openpaper.work/libinsane/latest/libinsane/workarounds_8h.html#a0ec64fe7451417fb6958dd30fad78f6d) (Sane, WIA)
-  - [ ] [no_write_on_single_value_opt](https://doc.openpaper.work/libinsane/latest/libinsane/workarounds_8h.html#af02c5e8777b0bf95ef7830604b448d24) (Sane)
+  - [X] [check_capabilities](https://doc.openpaper.work/libinsane/latest/libinsane/workarounds_8h.html#aaec395e8d54241792ef51789934d0c6a)
   - [ ] [dedicated_thread](https://doc.openpaper.work/libinsane/latest/libinsane/workarounds_8h.html#ad8371ab4f697733b492b51474bf9da8d) (Sane, WIA)
