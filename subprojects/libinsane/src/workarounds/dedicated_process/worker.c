@@ -165,11 +165,16 @@ static void crash_handler(int sig) {
 		);
 	}
 
+	fprintf(stderr, "======== START OF BACKTRACE ========\n");
+
 	// get void*'s for all entries on the stack
 	size = backtrace(stack, LIS_COUNT_OF(stack));
 
 	// print out all the frames to stderr
 	backtrace_symbols_fd(stack, size, STDERR_FILENO);
+
+	fsync(STDERR_FILENO);
+	fprintf(stderr, "======== END OF BACKTRACE ========\n");
 
 	if (kill(mypid, sig) < 0) {
 		fprintf(stderr, "KILL FAILED\n");
@@ -387,6 +392,10 @@ static void serialize_option(const struct lis_option_descriptor *desc, void **bu
 		);
 	}
 	if (buf != NULL) {
+		lis_log_info(
+			"Serializing option [%s] [%s] [%s] --> %p",
+			desc->name, desc->title, desc->desc, *buf
+		);
 		lis_pack(
 			buf,
 			"psssdddd",
@@ -630,9 +639,11 @@ static enum lis_error execute_session_scan_read(struct lis_msg *msg_in, struct l
 {
 	const void *ptr_in;
 	struct lis_scan_session *session;
+	int buffer_size;
 
 	ptr_in = msg_in->raw.iov_base;
-	lis_unpack(&ptr_in, "pd", &session, &msg_out->raw.iov_len);
+	lis_unpack(&ptr_in, "pd", &session, &buffer_size);
+	msg_out->raw.iov_len = buffer_size;
 
 	msg_out->raw.iov_base = malloc(msg_out->raw.iov_len);
 	if (msg_out->raw.iov_base == NULL) {
