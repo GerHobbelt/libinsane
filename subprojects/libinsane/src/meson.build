@@ -11,6 +11,7 @@ LIBINSANE_SRCS = files(
     'normalizers/raw.c',
     'normalizers/raw24.c',
     'normalizers/resolution_format.c',
+    'normalizers/safe_defaults.c',
     'normalizers/scan_area_opts.c',
     'normalizers/source_names.c',
     'normalizers/source_nodes.c',
@@ -24,9 +25,8 @@ LIBINSANE_SRCS = files(
     'workarounds/dedicated_thread.c',
     'workarounds/no_read_on_inactive_opt.c',
     'workarounds/no_write_on_readonly_opt.c',
-    'workarounds/opt_doc_source.c',
     'workarounds/opt_mode.c',
-    'workarounds/opt_scan_resolution.c',
+    'workarounds/opt_names.c',
     'workarounds/opts_page_size.c',
     'workarounds/strip_translations.c',
 )

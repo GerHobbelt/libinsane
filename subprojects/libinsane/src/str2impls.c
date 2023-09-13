@@ -88,6 +88,8 @@ enum lis_error lis_str2impls(const char *list_of_impls, struct lis_api **impls)
 				err = lis_api_normalizer_source_types(*impls, &next);
 			} else if (strcmp(tok, "strip_non_scanners") == 0) {
 				err = lis_api_normalizer_strip_non_scanners(*impls, &next);
+			} else if (strcmp(tok, "safe_defaults") == 0) {
+				err = lis_api_normalizer_safe_defaults(*impls, &next);
 			}
 			// -> workarounds
 			else if (strcmp(tok, "clean_dev_model_char") == 0) {
@@ -100,12 +102,10 @@ enum lis_error lis_str2impls(const char *list_of_impls, struct lis_api **impls)
 				err = lis_api_workaround_no_read_on_inactive_opt(*impls, &next);
 			} else if (strcmp(tok, "no_write_on_readonly_opt") == 0) {
 				err = lis_api_workaround_no_write_on_readonly_opt(*impls, &next);
-			} else if (strcmp(tok, "opt_doc_source") == 0) {
-				err = lis_api_workaround_opt_doc_source(*impls, &next);
+			} else if (strcmp(tok, "opt_names") == 0) {
+				err = lis_api_workaround_opt_names(*impls, &next);
 			} else if (strcmp(tok, "opt_mode") == 0) {
 				err = lis_api_workaround_opt_mode(*impls, &next);
-			} else if (strcmp(tok, "opt_scan_resolution") == 0) {
-				err = lis_api_workaround_opt_scan_resolution(*impls, &next);
 			} else if (strcmp(tok, "opts_page_size") == 0) {
 				err = lis_api_workaround_opts_page_size(*impls, &next);
 			} else if (strcmp(tok, "strip_translations") == 0) {

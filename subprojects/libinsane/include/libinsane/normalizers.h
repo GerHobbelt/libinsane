@@ -223,7 +223,9 @@ extern enum lis_error lis_api_normalizer_flatbed_and_feeder_behavior(
 
 
 /*!
- * \brief Ensure the scan area is set to the maximum by default.
+ * \brief Set safest default values
+ *
+ * ## Ensure the scan area is set to the maximum by default.
  *
  * By default, some drivers don't have the scan area set to the maximum.
  * This workaround just make sure the default area is the maximum area.
@@ -231,16 +233,7 @@ extern enum lis_error lis_api_normalizer_flatbed_and_feeder_behavior(
  *
  * Requires: \ref lis_api_normalizer_scan_area_opts
  *
- * \param[in] to_wrap Base implementation to wrap.
- * \param[out] impl Implementation of the API including the workaround.
- */
-extern enum lis_error lis_api_normalizer_maximize_scan_area(
-	struct lis_api *to_wrap, struct lis_api **impl
-);
-
-
-/*!
- * \brief Ensure the scan mode by default is 24bits colors.
+ * ## Ensure the scan mode by default is 24bits colors.
  *
  * By default, some drivers don't have the mode set to color.
  * This workaround just make sure the default mode is 24bits color.
@@ -250,7 +243,7 @@ extern enum lis_error lis_api_normalizer_maximize_scan_area(
  * \param[in] to_wrap Base implementation to wrap.
  * \param[out] impl Implementation of the API including the workaround.
  */
-extern enum lis_error lis_api_normalizer_default_mode_to_color(
+extern enum lis_error lis_api_normalizer_safe_defaults(
 	struct lis_api *to_wrap, struct lis_api **impl
 );
 
@@ -318,22 +311,6 @@ extern enum lis_error lis_api_normalizer_source_names(
  * \param[out] impl Implementation of the API including the workaround.
  */
 extern enum lis_error lis_api_normalizer_sources_order(
-	struct lis_api *to_wrap, struct lis_api **impl
-);
-
-
-/*!
- * \brief Automatically reload options when required
- *
- * When setting an option, the flag LIS_SET_FLAG_MUST_RELOAD_OPTIONS may be returned,
- * in which case, options must be reloaded through \ref lis_item.get_options().
- * This normalizer makes it happen automatically. However, it means previously
- * returned option descriptors may be updated automatically.
- *
- * \param[in] to_wrap Base implementation to wrap.
- * \param[out] impl Implementation of the API including the workaround.
- */
-extern enum lis_error lis_api_normalizer_auto_opt_reload(
 	struct lis_api *to_wrap, struct lis_api **impl
 );
 
