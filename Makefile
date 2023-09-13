@@ -32,8 +32,8 @@ gtkdoc:
 doc: build/build.ninja
 	# Libinsane doc
 	(cd build && ninja subprojects/libinsane/doc/doc_out)
-	# Libinsane-gobject doc
-	(cd build && ninja libinsane-gobject@@libinsane-gobject-doc)
+	# Libinsane-gobject doc (Meson 0.37.1 || Meson 0.47.1)
+	(cd build ; ninja libinsane-gobject-doc || ninja libinsane-gobject@@libinsane-gobject-doc)
 	rm -rf doc/build
 	mkdir -p doc/build
 	mv build/doc/html doc/build/libinsane
@@ -42,12 +42,7 @@ doc: build/build.ninja
 	echo "Documentation is available in doc/build/"
 
 check: build_c
-	@echo
-	@echo "### CHECK libinsane ###"
-	(cd libinsane/build ; ! /usr/lib/llvm-4.0/share/clang/run-clang-tidy.py | grep warning 2>&1)
-	@echo
-	@echo "### CHECK libinsane-gobject ###"
-	(cd libinsane-gobject/build ; ! /usr/lib/llvm-4.0/share/clang/run-clang-tidy.py | grep warning 2>&1)
+	(cd build ; ! /usr/lib/llvm-4.0/share/clang/run-clang-tidy.py | grep warning 2>&1)
 
 test: build/build.ninja
 	(cd build && ninja test)
@@ -63,6 +58,8 @@ else
 	@echo "Will release: ${RELEASE}"
 	@echo "Checking release is in ChangeLog ..."
 	grep ${RELEASE} ChangeLog
+	@echo "Checking release is in meson.build ..."
+	grep ${RELEASE} meson.build
 	@echo "Checking release is in subprojects/libinsane/meson.build ..."
 	grep ${RELEASE} subprojects/libinsane/meson.build
 	@echo "Checking release is in subprojects/libinsane-gobject/meson.build ..."
