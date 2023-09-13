@@ -21,11 +21,13 @@ libinsane_srcs = files(
     'safebet.c',
     'str2impls.c',
     'util.c',
+    'workarounds/cache.c',
     'workarounds/check_capabilities.c',
     'workarounds/dedicated_thread.c',
     'workarounds/one_page_flatbed.c',
     'workarounds/opt_names.c',
     'workarounds/opt_values.c',
+    'workarounds/set_opt_late.c',
 )
 
 deps = [dependency('threads')]
