@@ -34,6 +34,7 @@ static void child_close(struct lis_item *self);
 
 static const struct lis_item g_mos_item_template =
 {
+	.type = LIS_ITEM_UNIDENTIFIED,
 	.get_children = child_get_children,
 	.get_options = item_get_options,
 	.scan_start = item_scan_start,
@@ -73,8 +74,26 @@ static enum lis_error root_get_children(struct lis_item *self, struct lis_item *
 		return LIS_ERR_NO_MEM;
 	}
 	memcpy(&child->parent, &g_mos_item_template, sizeof(child->parent));
+
+	// if the root has a specific type, keep it
+	// otherwise --> unidentified
 	child->parent.name = OPT_VALUE_SOURCE_FLATBED;
-	child->parent.type = original->type;
+	child->parent.type = LIS_ITEM_UNIDENTIFIED;
+	switch(original->type)
+	{
+		case LIS_ITEM_DEVICE:
+		case LIS_ITEM_UNIDENTIFIED:
+			break;
+		case LIS_ITEM_FLATBED:
+			child->parent.name = OPT_VALUE_SOURCE_FLATBED;
+			child->parent.type = original->type;
+			break;
+		case LIS_ITEM_ADF:
+			child->parent.name = OPT_VALUE_SOURCE_ADF;
+			child->parent.type = original->type;
+			break;
+	}
+
 	child->ptrs[0] = &child->parent;
 	child->ptrs[1] = NULL;
 	child->wrapped = original;
