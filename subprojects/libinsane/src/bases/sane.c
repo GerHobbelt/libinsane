@@ -435,7 +435,7 @@ static enum lis_error lis_sane_item_get_scan_parameters(
 
 	lis_log_debug("sane_get_parameters() ...");
 	err = sane_status_to_lis_error(sane_get_parameters(private->handle, &p));
-	lis_log_debug("sane_get_parameters(): %d, %s", err, lis_strerror(err));
+	lis_log_debug("sane_get_parameters(): 0x%X, %s", err, lis_strerror(err));
 	if (LIS_IS_ERROR(err)) {
 		lis_log_error("%s->sane_get_parameters(): 0x%X, %s",
 				self->name, err, lis_strerror(err));
@@ -1086,10 +1086,16 @@ static enum lis_error lis_sane_scan_read(
 
 			err = sane_status_to_lis_error(sane_err);
 			if (LIS_IS_ERROR(err)) {
-				lis_log_warning("sane_start() failed: %d, %s",
+				// WORKAROUND(Jflesch): Epson XP-425:
+				// Only has a Flatbed. First call to sane_start() + sane_read()
+				// work fine. Second call sane_start() return .. I/O error.
+				// Unfortunately, this can hardly be managed in a dedicated
+				// workaround reliably.
+				lis_log_warning("sane_start() failed: 0x%X, %s (assuming end of feed)",
 					err, lis_strerror(err));
+				private->end_of_feed = 1;
 			}
-			return err;
+			return LIS_OK;
 		case SANE_STATUS_NO_DOCS:
 			private->end_of_page = 1;
 			private->end_of_feed = 1;
@@ -1097,7 +1103,7 @@ static enum lis_error lis_sane_scan_read(
 			return LIS_OK;
 		default:
 			err = sane_status_to_lis_error(sane_err);
-			lis_log_warning("Unexpected error from sane_read(): %d, %s",
+			lis_log_warning("Unexpected error from sane_read(): 0x%X, %s",
 					err, lis_strerror(err));
 			return sane_status_to_lis_error(sane_err);
 	}
