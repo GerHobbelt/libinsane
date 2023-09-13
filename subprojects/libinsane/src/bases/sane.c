@@ -512,7 +512,11 @@ static enum lis_error lis_sane_item_get_scan_parameters(
 
 	switch(p.format) {
 		case SANE_FRAME_GRAY:
-			out_p->format = LIS_IMG_FORMAT_GRAYSCALE_8;
+			if (p.depth == 1) {
+				out_p->format = LIS_IMG_FORMAT_BW_1;
+			} else {
+				out_p->format = LIS_IMG_FORMAT_GRAYSCALE_8;
+			}
 			break;
 		case SANE_FRAME_RGB:
 			out_p->format = LIS_IMG_FORMAT_RAW_RGB_24;
@@ -1104,6 +1108,7 @@ static enum lis_error lis_sane_scan_start(struct lis_item *self,
 {
 	struct lis_sane_item *private = LIS_SANE_ITEM_PRIVATE(self);
 	SANE_Status sane_err;
+	enum lis_error err;
 
 	lis_log_info("Sane: scan_start() ...");
 
@@ -1125,7 +1130,11 @@ static enum lis_error lis_sane_scan_start(struct lis_item *self,
 		sane_cancel(private->handle);
 		return LIS_OK;
 	}
-	lis_log_info("Sane: scan_start() OK");
+	err = sane_status_to_lis_error(sane_err);
+	lis_log_info(
+		"Sane: scan_start(): %d -> %d, %s",
+		sane_err, err, lis_strerror(err)
+	);
 	return sane_status_to_lis_error(sane_err);
 }
 
