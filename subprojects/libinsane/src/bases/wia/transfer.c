@@ -626,7 +626,8 @@ static void scan_cancel(struct lis_scan_session *_self)
 
 	self->wia_item->lpVtbl->Release(self->wia_item);
 	self->wia_props->lpVtbl->Release(self->wia_props);
-	GlobalFree(self);
+	// XXX(Jflesch): Crashes on 64bits sometimes. disabled for now.
+	// GlobalFree(self);
 }
 
 
@@ -1001,6 +1002,16 @@ static HRESULT WINAPI wia_stream_seek(
 		case STREAM_SEEK_END:
 			origin = "END";
 			break;
+	}
+
+	if (plibNewPosition == NULL) {
+		// Canon i-SENSYS MF3010
+		lis_log_info(
+			"IStream->Seek(%ld, %s, NULL) (written=%ld B)",
+			(long)dlibMove.QuadPart, origin,
+			self->scan.written
+		);
+		return S_OK;
 	}
 
 	lis_log_info(
