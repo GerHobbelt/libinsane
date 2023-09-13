@@ -53,6 +53,8 @@ enum lis_error lis_bmp2scan_params(
 
 	assert(sizeof(struct bmp_header) == BMP_HEADER_SIZE);
 
+	lis_hexdump(bmp, BMP_HEADER_SIZE);
+
 	header = bmp;
 	*header_size = le32toh(header->offset_to_data);
 
@@ -80,15 +82,27 @@ enum lis_error lis_bmp2scan_params(
 		lis_log_error("BMP: Don't know how to handle compression: 0x%"PRIX32, le32toh(header->compression));
 		return LIS_ERR_INTERNAL_IMG_FORMAT_NOT_SUPPORTED;
 	}
-	if (le32toh(header->pixel_data_size) != 24) {
+	if (le32toh(header->nb_bits_per_pixel) != 24) {
 		lis_log_error("BMP: Unexpected pixel data size: %u", le32toh(header->pixel_data_size));
 		return LIS_ERR_INTERNAL_IMG_FORMAT_NOT_SUPPORTED;
 	}
 
 	params->format = LIS_IMG_FORMAT_RAW_RGB_24;
 	params->width = le32toh(header->width);
-	params->height = le32toh(header->height);
 	params->image_size = header->file_size - header->offset_to_data;
+
+	params->height = le32toh(header->height);
+	if (params->height < 0) {
+		// XXX(Jflesch): Epsom XP-425 says crap
+		params->height *= -1;
+	}
+	params->width = le32toh(header->width);
+	if (params->width < 0) {
+		// XXX(Jflesch): Epsom XP-425 says crap on height, so I assume
+		// it can also happen on width
+		params->width *= -1;
+	}
+
 	lis_log_info(
 		"BMP header says: %d x %d = %lu",
 		params->width, params->height,

@@ -489,10 +489,10 @@ typedef struct LisIWiaDevMgr2Vtbl {
 
 typedef struct LisWiaTransferParams
 {
-    LONG lMessage;
-    LONG lPercentComplete;
-    ULONG64 ulTransferredBytes;
-    HRESULT hrErrorStatus;
+	LONG lMessage;
+	LONG lPercentComplete;
+	ULONG64 ulTransferredBytes;
+	HRESULT hrErrorStatus;
 } LisWiaTransferParams;
 
 
@@ -504,34 +504,34 @@ typedef struct LisIWiaTransferCallback {
 typedef struct LisIWiaTransferCallbackVtbl {
 	BEGIN_INTERFACE
 
-    HRESULT (WINAPI *QueryInterface)(
-        LisIWiaTransferCallback *self,
-        REFIID riid,
-        void **ppvObject
+	HRESULT (WINAPI *QueryInterface)(
+		LisIWiaTransferCallback *self,
+		REFIID riid,
+		void **ppvObject
 	);
 
-    ULONG (WINAPI *AddRef)(
-        LisIWiaTransferCallback *self
+	ULONG (WINAPI *AddRef)(
+		LisIWiaTransferCallback *self
 	);
 
-    ULONG (WINAPI *Release)(
-        LisIWiaTransferCallback *self
+	ULONG (WINAPI *Release)(
+		LisIWiaTransferCallback *self
 	);
 
 	HRESULT (WINAPI *TransferCallback)(
-        LisIWiaTransferCallback *self,
-        LONG lFlags,
-        LisWiaTransferParams *pWiaTransferParams
+		LisIWiaTransferCallback *self,
+		LONG lFlags,
+		LisWiaTransferParams *pWiaTransferParams
 	);
 
-    HRESULT (WINAPI *GetNextStream )(
-        LisIWiaTransferCallback *self,
-        LONG lFlags,
-        BSTR bstrItemName,
-        BSTR bstrFullItemName,
-        IStream **ppDestination
+	HRESULT (WINAPI *GetNextStream)(
+		LisIWiaTransferCallback *self,
+		LONG lFlags,
+		BSTR bstrItemName,
+		BSTR bstrFullItemName,
+		IStream **ppDestination
 	);
-	
+
 	END_INTERFACE
 } LisIWiaTransferCallbackVtbl;
 
@@ -545,43 +545,92 @@ typedef struct LisIWiaTransferVtbl {
 	BEGIN_INTERFACE
 
 	HRESULT (WINAPI *QueryInterface)(
-        LisIWiaTransfer *self,
-        REFIID riid,
-        void **ppvObject
+		LisIWiaTransfer *self,
+		REFIID riid,
+		void **ppvObject
 	);
 
-    ULONG (WINAPI *AddRef)(
-        LisIWiaTransfer *self
+	ULONG (WINAPI *AddRef)(
+		LisIWiaTransfer *self
 	);
 
-    ULONG (WINAPI *Release)(
-        LisIWiaTransfer *self
+	ULONG (WINAPI *Release)(
+		LisIWiaTransfer *self
 	);
 
-    HRESULT (WINAPI *Download)(
-        LisIWiaTransfer *self,
-        LONG lFlags,
-        LisIWiaTransferCallback *pIWiaTransferCallback
+	HRESULT (WINAPI *Download)(
+		LisIWiaTransfer *self,
+		LONG lFlags,
+		LisIWiaTransferCallback *pIWiaTransferCallback
 	);
 
-    HRESULT (WINAPI *Upload)(
-        LisIWiaTransfer * This,
-        LONG lFlags,
-        IStream *pSource,
-        LisIWiaTransferCallback *pIWiaTransferCallback
+	HRESULT (WINAPI *Upload)(
+		LisIWiaTransfer * This,
+		LONG lFlags,
+		IStream *pSource,
+		LisIWiaTransferCallback *pIWiaTransferCallback
 	);
 
-    HRESULT (WINAPI *Cancel)(
-        LisIWiaTransfer *self
+	HRESULT (WINAPI *Cancel)(
+		LisIWiaTransfer *self
 	);
 
-    HRESULT (WINAPI *EnumWIA_FORMAT_INFO)(
-        LisIWiaTransfer *self,
-        IEnumWIA_FORMAT_INFO **ppEnum
+	HRESULT (WINAPI *EnumWIA_FORMAT_INFO)(
+		LisIWiaTransfer *self,
+		IEnumWIA_FORMAT_INFO **ppEnum
 	);
-	
+
 	END_INTERFACE
 } LisIWiaTransferVtbl;
+
+
+typedef struct LisIWiaAppErrorHandler {
+	CONST_VTBL struct LisIWiaAppErrorHandlerVtbl *lpVtbl;
+} LisIWiaAppErrorHandler;
+
+
+typedef struct LisIWiaAppErrorHandlerVtbl {
+	BEGIN_INTERFACE
+
+	HRESULT (WINAPI *QueryInterface)(
+		LisIWiaAppErrorHandler *self,
+		REFIID riid,
+		void **ppvObject
+	);
+
+	ULONG (WINAPI *AddRef)(
+		LisIWiaAppErrorHandler *self
+	);
+
+	ULONG (WINAPI *Release)(
+		LisIWiaAppErrorHandler *self
+	);
+
+	HRESULT (WINAPI *GetWindow)(
+		LisIWiaAppErrorHandler * This,
+		HWND *phwnd
+	);
+
+	HRESULT (STDMETHODCALLTYPE *ReportStatus)(
+		LisIWiaAppErrorHandler * This,
+		LONG lFlags,
+		LisIWiaItem2 *pWiaItem2,
+		HRESULT hrStatus,
+		LONG lPercentComplete
+	);
+
+	END_INTERFACE
+} LisIWiaAppErrorHandlerVtbl;
+
+
+DEFINE_GUID(
+	IID_LisWiaAppErrorHandler,
+	0x6C16186C,
+	0xD0A6,
+	0x400C,
+	0x80, 0xF4,
+	0xD2, 0x69, 0x86, 0xA0, 0xE7, 0x34
+);
 
 
 DEFINE_GUID(
@@ -619,5 +668,12 @@ DEFINE_GUID(
 	0x9a, 0xab,
 	0xe6, 0x78, 0x16, 0x8b, 0x95, 0x27
 );
+
+
+#define LIS_WIA_TRANSFER_MSG_STATUS 1
+#define LIS_WIA_TRANSFER_MSG_END_OF_STREAM 2
+#define LIS_WIA_TRANSFER_MSG_END_OF_TRANSFER 3
+#define LIS_WIA_TRANSFER_MSG_DEVICE_STATUS 5
+#define LIS_WIA_TRANSFER_MSG_NEW_PAGE 6
 
 #endif

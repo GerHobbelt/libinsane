@@ -3,11 +3,11 @@ pkg = import('pkgconfig')
 libinsane_srcs = files(
     'bases/dumb.c',
     'basewrapper.c',
+    'bmp.c',
     'error.c',
     'log.c',
     'multiplexer.c',
     'normalizers/all_opts_on_all_sources.c',
-    'normalizers/bmp.c',
     'normalizers/bmp2raw.c',
     'normalizers/clean_dev_descs.c',
     'normalizers/min_one_source.c',
@@ -36,9 +36,9 @@ if host_machine.system() == 'windows'
     libinsane_srcs += [
         'bases/twain.c',
         'bases/wia/properties.c',
-        'bases/wia/wia_automation.c',
-        'bases/wia/wia_ll.c',
+        'bases/wia/transfer.c',
         'bases/wia/util.c',
+        'bases/wia/wia_ll.c',
     ]
     deps += [
         dependency('regex'),
