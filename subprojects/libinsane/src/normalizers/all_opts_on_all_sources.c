@@ -37,7 +37,7 @@ static enum lis_error opts_list_devices(
 static enum lis_error opts_get_device(struct lis_api *impl, const char *dev_id, struct lis_item **item);
 
 
-static struct lis_api g_impl_template = {
+static const struct lis_api g_impl_template = {
 	.cleanup = opts_cleanup,
 	.list_devices = opts_list_devices,
 	.get_device = opts_get_device,
@@ -51,26 +51,21 @@ static enum lis_error opts_dev_get_options(
 static enum lis_error opts_source_get_options(
 	struct lis_item *self, struct lis_option_descriptor ***descs
 );
-static enum lis_error opts_get_scan_parameters(
-	struct lis_item *self, struct lis_scan_parameters *parameters
-);
 static enum lis_error opts_scan_start(struct lis_item *self, struct lis_scan_session **session);
 static void opts_dev_close(struct lis_item *self);
 static void opts_source_close(struct lis_item *self);
 
 
-static struct lis_item g_dev_template = {
+static const struct lis_item g_dev_template = {
 	.get_children = opts_get_children,
 	.get_options = opts_dev_get_options,
-	.get_scan_parameters = opts_get_scan_parameters,
 	.scan_start = opts_scan_start,
 	.close = opts_dev_close,
 };
 
-static struct lis_item g_source_template = {
+static const struct lis_item g_source_template = {
 	.get_children = opts_get_children,
 	.get_options = opts_source_get_options,
-	.get_scan_parameters = opts_get_scan_parameters,
 	.scan_start = opts_scan_start,
 	.close = opts_source_close,
 };
@@ -310,15 +305,6 @@ static enum lis_error opts_source_get_options(
 
 	*out_descs = private->opts;
 	return LIS_OK;
-}
-
-
-static enum lis_error opts_get_scan_parameters(
-		struct lis_item *self, struct lis_scan_parameters *parameters
-	)
-{
-	struct opts_item *private = LIS_OPTS_ITEM_PRIVATE(self);
-	return private->wrapped->get_scan_parameters(private->wrapped, parameters);
 }
 
 

@@ -250,6 +250,29 @@ struct lis_scan_parameters {
 
 struct lis_scan_session {
 	/*!
+	 * \brief Returns a description of what will be returned when scanning.
+	 *
+	 * This is only an estimation.
+	 *
+	 * Format is guaranteed to be right.
+	 *
+	 * Width is always guaranteed
+	 *
+	 * Beware: Height is never guaranteed (usually the scan will be shorted,
+	 * but it may also be longer !).
+	 *
+	 * Beware: Image size is never guaranteed.
+	 *
+	 * \param[in] self Item from which the scan will be done.
+	 * \param[out] parameters Estimation of what will be scanned.
+	 * \retval LIS_OK parameters has been set.
+	 */
+	enum lis_error (*get_scan_parameters)(
+		struct lis_scan_session *self,
+		struct lis_scan_parameters *parameters
+	);
+
+	/*!
 	 * \brief Indicates if we have reached the end of the feed.
 	 * Should be called at least each time \ref end_of_page returns 1.
 	 */
@@ -281,6 +304,7 @@ struct lis_scan_session {
 	 * \retval LIS_END_OF_FEED A whole page feed has been read. Do not call \ref lis_scan_session.cancel().
 	 * \retval LIS_WARMING_UP Scanner is warming up. No data available yet. Keep calling
 	 *		\ref lis_scan_session.scan_read() until there is.
+	 * \warning This operation may take many seconds.
 	 */
 	enum lis_error (*scan_read) (
 		struct lis_scan_session *session, void *out_buffer, size_t *buffer_size
@@ -345,29 +369,6 @@ struct lis_item {
 	);
 
 	/*!
-	 * \brief Returns a description of what will be returned when scanning.
-	 *
-	 * This is only an estimation.
-	 *
-	 * Format is guaranteed to be right.
-	 *
-	 * Beware: Width is only guaranteed once a scan session has been started
-	 * (see \ref lis_item.scan_start).
-	 *
-	 * Beware: Height is never guaranteed (usually the scan will be shorted,
-	 * but it may also be longer !).
-	 *
-	 * Beware: Image size is never guaranteed.
-	 *
-	 * \param[in] self Item from which the scan will be done.
-	 * \param[out] parameters Estimation of what will be scanned.
-	 * \retval LIS_OK parameters has been set.
-	 */
-	enum lis_error (*get_scan_parameters)(
-		struct lis_item *self, struct lis_scan_parameters *parameters
-	);
-
-	/*!
 	 * \brief Starts a scan session.
 	 * \warning This operation may take many seconds.
 	 * \param[in] self Item from which to scan.
@@ -428,7 +429,8 @@ struct lis_api {
 	 * \retval LIS_OK dev_infos has been set to a list of devices. See \ref LIS_IS_OK.
 	 */
 	enum lis_error (*list_devices)(
-		struct lis_api *impl, enum lis_device_locations, struct lis_device_descriptor ***dev_infos
+		struct lis_api *impl, enum lis_device_locations locs,
+		struct lis_device_descriptor ***dev_infos
 	);
 
 	/*!
@@ -444,7 +446,9 @@ struct lis_api {
 	 *		See \ref LIS_IS_ERROR.
 	 * \retval LIS_ERR_ACCESS_DENIED Permission denied. See \ref LIS_IS_ERROR.
 	 */
-	enum lis_error (*get_device)(struct lis_api *impl, const char *dev_id, struct lis_item **item);
+	enum lis_error (*get_device)(
+		struct lis_api *impl, const char *dev_id, struct lis_item **item
+	);
 };
 
 #ifdef __cplusplus

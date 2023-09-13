@@ -72,14 +72,14 @@ enum lis_error lis_str2impls(const char *list_of_impls, struct lis_api **impls)
 				err = lis_api_normalizer_all_opts_on_all_sources(*impls, &next);
 			} else if (strcmp(tok, "min_one_source") == 0) {
 				err = lis_api_normalizer_min_one_source(*impls, &next);
-			} else if (strcmp(tok, "raw") == 0) {
-				err = lis_api_normalizer_raw(*impls, &next);
+			} else if (strcmp(tok, "bmp2raw") == 0) {
+				err = lis_api_normalizer_bmp2raw(*impls, &next);
 			} else if (strcmp(tok, "raw24") == 0) {
 				err = lis_api_normalizer_raw24(*impls, &next);
 			} else if (strcmp(tok, "resolution") == 0) {
 				err = lis_api_normalizer_resolution(*impls, &next);
-			} else if (strcmp(tok, "scan_area_opts") == 0) {
-				err = lis_api_normalizer_scan_area_opts(*impls, &next);
+			} else if (strcmp(tok, "opt_aliases") == 0) {
+				err = lis_api_normalizer_opt_aliases(*impls, &next);
 			} else if (strcmp(tok, "source_nodes") == 0) {
 				err = lis_api_normalizer_source_nodes(*impls, &next);
 			} else if (strcmp(tok, "source_types") == 0) {
