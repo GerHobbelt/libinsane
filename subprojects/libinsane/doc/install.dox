@@ -89,7 +89,7 @@ sudo make uninstall
 
 If you do not wish to install Libinsane system-wide, you can use the script
 `activate_test_env.sh`. It will set all the environment variables required
-so you program can find Libinsane.
+so your program can find Libinsane.
 
 ```
 cd libinsane
@@ -129,7 +129,7 @@ pacman -S \
         mingw-w64-i686-vala
 ```
 
-If you plan on compiling your program as a 32bits executable, you just
+If you plan on compiling your program as a 64bits executable, you just
 have to replace all the `i686` by `x86_64`.
 
 
