@@ -5,7 +5,6 @@ LIBINSANE_SRCS = files(
     'log.c',
     'multiplexer.c',
     'normalizers/all_opts_on_all_sources.c',
-    'normalizers/end_of_feed.c',
     'normalizers/flatbed_and_feeder_behavior.c',
     'normalizers/min_one_source.c',
     'normalizers/raw.c',
@@ -16,7 +15,6 @@ LIBINSANE_SRCS = files(
     'normalizers/source_names.c',
     'normalizers/source_nodes.c',
     'normalizers/source_types.c',
-    'normalizers/sources_order.c',
     'normalizers/strip_non_scanners.c',
     'safebet.c',
     'str2impls.c',
@@ -25,10 +23,9 @@ LIBINSANE_SRCS = files(
     'workarounds/dedicated_thread.c',
     'workarounds/no_read_on_inactive_opt.c',
     'workarounds/no_write_on_readonly_opt.c',
-    'workarounds/opt_mode.c',
     'workarounds/opt_names.c',
+    'workarounds/opt_values.c',
     'workarounds/opts_page_size.c',
-    'workarounds/strip_translations.c',
 )
 
 if host_machine.system() == 'windows'
