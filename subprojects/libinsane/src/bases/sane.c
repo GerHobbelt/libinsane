@@ -898,6 +898,7 @@ static enum lis_error control_sane_value(
 {
 	SANE_Status sane_status = SANE_STATUS_UNSUPPORTED;
 	int fixed_value;
+	char dup[256];
 
 	switch(private->parent.value.type) {
 		case LIS_TYPE_BOOL:
@@ -960,11 +961,17 @@ static enum lis_error control_sane_value(
 					}
 					break;
 				case SANE_ACTION_SET_VALUE:
+					// WORKAROUND(JFlesch):
+					// libsane backend 'net' writes back
+					// the value in the buffer with
+					// memcpy() ...
+					strncpy(dup, value->string, sizeof(dup));
+					dup[sizeof(dup) - 1] = '\0';
 					sane_status = sane_control_option(
 						private->item->handle,
 						private->opt_idx,
 						SANE_ACTION_SET_VALUE,
-						(void *)value->string, // strip const attribute
+						dup,
 						set_flags
 					);
 					break;

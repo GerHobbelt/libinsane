@@ -2,6 +2,7 @@
 #include <inttypes.h>
 #include <stdio.h>
 #include <stdint.h>
+#include <string.h>
 
 #include <libinsane/log.h>
 #include <libinsane/util.h>
@@ -15,8 +16,15 @@
 // XXX(Jflesch): assuming Windows x86 --> little endian
 
 #define le32toh(v) (v)
+#define htole32(v) (v)
+#define htole16(v) (v)
 
 static inline uint16_t be16toh(uint16_t v)
+{
+	return ((v << 8) | (v >> 8));
+}
+
+static inline uint16_t htobe16(uint16_t v)
 {
 	return ((v << 8) | (v >> 8));
 }
@@ -112,3 +120,34 @@ enum lis_error lis_bmp2scan_params(
 	return LIS_OK;
 }
 
+
+void lis_scan_params2bmp(
+		const struct lis_scan_parameters *params,
+		void *_header
+	)
+{
+	struct bmp_header *header = _header;
+	size_t pixel_data;
+	size_t line_length;
+	size_t padding;
+
+	line_length = params->width * 3;
+	padding = 4 - (line_length % 4);
+	if (padding == 4) {
+		padding = 0;
+	}
+
+	memset(header, 0, sizeof(struct bmp_header));
+	header->magic = htobe16(0x424D);
+	header->offset_to_data = htole32(BMP_HEADER_SIZE);
+	header->remaining_header = htole32(0x28);
+	header->nb_color_planes = htole16(1);
+	header->nb_bits_per_pixel = htole16(24);
+	header->height = htole32(params->height);
+	header->width = htole32(params->width);
+
+	// padding must be taken into account
+	pixel_data = (params->height * (line_length + padding));
+	header->pixel_data_size = htole32(pixel_data);
+	header->file_size = htole32(BMP_HEADER_SIZE + pixel_data);
+}
