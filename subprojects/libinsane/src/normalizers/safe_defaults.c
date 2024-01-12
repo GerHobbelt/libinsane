@@ -210,7 +210,7 @@ static enum lis_error set_to_limit(struct lis_option_descriptor *opt, void *cb_d
 	} else {
 		// Sane + Epson Perfection 1250
 		// https://gitlab.gnome.org/World/OpenPaperwork/libinsane/issues/17
-		// https://openpaper.work/en-us/scanner_db/report/328/
+		// https://openpaper.work/en/scanner_db/report/328/
 		if (opt->value.type == LIS_TYPE_INTEGER) {
 			lis_log_info("Current value of option '%s' = %d", opt->name, value.integer);
 			if (data->minmax > 0) {

@@ -36,7 +36,7 @@ extern enum lis_error lis_api_normalizer_source_nodes(
  *
  * - Culprits: Microsoft, Sane project
  *
- * Sane: [Some scanner do not provide the option "source"](https://openpaper.work/en-us/scanner_db/report/57).
+ * Sane: [Some scanner do not provide the option "source"](https://openpaper.work/en/scanner_db/report/57).
  *
  * WIA2: [Some scanners do not always provide a source](https://openpaper.work/en/scanner_db/report/28). Scan is done directly on them.
  *
