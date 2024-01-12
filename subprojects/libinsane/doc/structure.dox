@@ -26,11 +26,13 @@ changing slightly the behavior of the wrapped component.
   provide themselves an implementation of the normalized API.
 - Behavior normalization components wraps too the normalized API provided
   by others, and provide themselves an implementation of the normalized API.
-- One of the components manage make it possible to access multiple components
+- One of the components makes it possible to access multiple components
   at the same time: It wraps multiple implementations of the normalized API
-  and provides a single implem.. well you get the idea ?
+  and provides a single implementation.
 - GObject Introspection support simply wrap any implementation of the
   normalized API.
+
+I think at this point, you get the idea ?
 
 Since most of the components wrap other components, they can be stacked easily
 each on top of another and can be enabled or disabled easily.
