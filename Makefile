@@ -27,7 +27,7 @@ build/build.ninja:
 	mkdir -p build
 	echo "Uname: " $(UNAME)
 	echo "CFLAGS: " $(CFLAGS)
-	(cd build && CFLAGS="$(CFLAGS)" meson --werror --warnlevel 2 --prefix=${PREFIX} ..)
+	(cd build && CFLAGS="$(CFLAGS)" meson setup --werror --warnlevel 2 --prefix=${PREFIX} ..)
 
 build_c: build/build.ninja
 	(cd build && ninja)
