@@ -271,7 +271,8 @@ struct lis_scan_session {
 	 * Beware: Height is never guaranteed (usually the scan will be shorted,
 	 * but it may also be longer !).
 	 *
-	 * Beware: Image size is never guaranteed.
+	 * Beware: Height may be -1 ! In that case, it means the height
+	 * is not known beforehand (for instance with handheld scanners).
 	 *
 	 * \param[in] self Item from which the scan will be done.
 	 * \param[out] parameters Estimation of what will be scanned.
