@@ -250,6 +250,9 @@ extern enum lis_error lis_api_workaround_lamp(
  *
  * This workaround makes sure that when it happens, end_of_feed() is correctly
  * reported.
+ *
+ * Remark: an height of -1 means there is still some paper to scan but
+ * we don't know the page size yet.
  */
 extern enum lis_error lis_api_workaround_invalid_page_size(
 	struct lis_api *to_wrap, struct lis_api **out_impl

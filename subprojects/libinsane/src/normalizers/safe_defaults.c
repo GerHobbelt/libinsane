@@ -130,6 +130,15 @@ static const struct safe_setter g_safe_setters[] = {
 		.flags = SET_IMMEDIATELY | SET_BEFORE_SCAN,
 	},
 
+	// Fujitsu fi-6130dj + Sane
+	// Enable Automatic Length Detection. Beware it means we won't know
+	// the page height beforehand.
+	{
+		.opt_name = "ald",
+		.cb = set_boolean,
+		.cb_data = (void*)1, /* TRUE */
+		.flags = SET_IMMEDIATELY,
+	},
 
 	// Sane test backend:
 	{
