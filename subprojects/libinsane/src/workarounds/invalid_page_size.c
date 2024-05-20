@@ -120,7 +120,16 @@ static int lis_ips_end_of_feed(struct lis_scan_session *session)
 			return 1;
 		}
 
-		if (params.width <= 0 || params.height <= 0) {
+		/* XXX(Jflesch):
+		 * This weird condition is not a typo:
+		 * - in all cases, we need the width beforehand.
+		 * - we don't need the height beforehand:
+		 *   * -1 means we will only know the height once the scan is
+		 *     done (see Fujistu scanners + Sane)
+		 *   * 0 means the crappy end-of-feed we are looking for here
+		 *     (see some Brother scanners)
+		 */
+		if (params.width <= 0 || params.height == 0) {
 			lis_log_warning(
 				"Invalid page size: %dx%d. Assuming end of feed.",
 				params.width, params.height

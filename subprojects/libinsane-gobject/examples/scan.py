@@ -131,11 +131,17 @@ def scan(source, output_file):
         while not session.end_of_feed() and page_nb < 20:
             # Do not assume that all the pages will have the same size !
             scan_params = session.get_scan_parameters()
-            print("Expected scan parameters: {} ; {}x{} = {} bytes".format(
-                  scan_params.get_format(),
-                  scan_params.get_width(), scan_params.get_height(),
-                  scan_params.get_image_size()))
             total = scan_params.get_image_size()
+            if scan_params.get_height() < 0:
+                total = "unknown"
+            else:
+                total = f"{total} B"
+            print(
+                "Expected scan parameters:"
+                f" {scan_params.get_format()} ;"
+                f" {scan_params.get_width()}x{scan_params.get_height()}"
+                f" = {total}"
+            )
 
             img = []
             r = 0
@@ -149,9 +155,8 @@ def scan(source, output_file):
                 data = data.get_data()
                 img.append(data)
                 r += len(data)
-                print("Got {} bytes => {}/{} bytes".format(
-                    len(data), r, total)
-                )
+                print(f"Got {len(data)} bytes => {r} B / {total}")
+
             img = b"".join(img)
             print("Got {} bytes".format(len(img)))
             if out is not None:

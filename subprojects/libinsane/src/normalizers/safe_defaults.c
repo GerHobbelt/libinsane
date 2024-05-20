@@ -67,34 +67,44 @@ static struct limit_data g_limit_data[] = {
 static const struct safe_setter g_safe_setters[] = {
 	// all backends:
 	{
-		.opt_name = OPT_NAME_MODE, .cb = set_str,
-		.cb_data = OPT_VALUE_MODE_COLOR, .flags = SET_IMMEDIATELY,
+		.opt_name = OPT_NAME_MODE,
+		.cb = set_str,
+		.cb_data = OPT_VALUE_MODE_COLOR,
+		.flags = SET_IMMEDIATELY,
 	},
 	{
-		.opt_name = OPT_NAME_PREVIEW, .cb = set_preview,
-		.cb_data = &g_numbers[0] /* false */, .flags = SET_IMMEDIATELY,
+		.opt_name = OPT_NAME_PREVIEW,
+		.cb = set_preview,
+		.cb_data = &g_numbers[0] /* false */,
+		.flags = SET_IMMEDIATELY,
 	},
 	{
-		.opt_name = OPT_NAME_RESOLUTION, .cb = set_int,
-		.cb_data = &g_numbers[3] /* 300 */, .flags = SET_IMMEDIATELY,
+		.opt_name = OPT_NAME_RESOLUTION,
+		.cb = set_int,
+		.cb_data = &g_numbers[3] /* 300 */,
+		.flags = SET_IMMEDIATELY,
 	},
 	{
-		.opt_name = OPT_NAME_TL_X, .cb = set_to_limit,
+		.opt_name = OPT_NAME_TL_X,
+		.cb = set_to_limit,
 		.cb_data = &g_limit_data[0], // min
 		.flags = SET_IMMEDIATELY | SET_BEFORE_SCAN,
 	},
 	{
-		.opt_name = OPT_NAME_TL_Y, .cb = set_to_limit,
+		.opt_name = OPT_NAME_TL_Y,
+		.cb = set_to_limit,
 		.cb_data = &g_limit_data[0], // min
 		.flags = SET_IMMEDIATELY | SET_BEFORE_SCAN,
 	},
 	{
-		.opt_name = OPT_NAME_BR_X, .cb = set_to_limit,
+		.opt_name = OPT_NAME_BR_X,
+		.cb = set_to_limit,
 		.cb_data = &g_limit_data[1], // max
 		.flags = SET_IMMEDIATELY | SET_BEFORE_SCAN,
 	},
 	{
-		.opt_name = OPT_NAME_BR_Y, .cb = set_to_limit,
+		.opt_name = OPT_NAME_BR_Y,
+		.cb = set_to_limit,
 		.cb_data = &g_limit_data[1], // max
 		.flags = SET_IMMEDIATELY | SET_BEFORE_SCAN,
 	},
@@ -105,12 +115,14 @@ static const struct safe_setter g_safe_setters[] = {
 	// ==> Default values are crap.
 	// ==> Since this feature is Fujistu-specific, here we disable automatic centering.
 	{
-		.opt_name = "page-width", .cb = set_to_limit,
+		.opt_name = "page-width",
+		.cb = set_to_limit,
 		.cb_data = &g_limit_data[1], // max
 		.flags = SET_IMMEDIATELY | SET_BEFORE_SCAN,
 	},
 	{
-		.opt_name = "page-height", .cb = set_to_limit,
+		.opt_name = "page-height",
+		.cb = set_to_limit,
 		// WORKAROUND(Jflesch): Fujitsu Fi-6130:
 		// page-height must not be set to max, but to very slightly
 		// less. If set to max, scan_start() fails in most cases.
@@ -118,54 +130,72 @@ static const struct safe_setter g_safe_setters[] = {
 		.flags = SET_IMMEDIATELY | SET_BEFORE_SCAN,
 	},
 
+	// Fujitsu fi-6130dj + Sane
+	// Enable Automatic Length Detection. Beware it means we won't know
+	// the page height beforehand.
+	{
+		.opt_name = "ald",
+		.cb = set_boolean,
+		.cb_data = (void*)1, /* TRUE */
+		.flags = SET_IMMEDIATELY,
+	},
 
 	// Sane test backend:
 	{
-		.opt_name = "test-picture", .cb = set_str,
+		.opt_name = "test-picture",
+		.cb = set_str,
 		.cb_data = "Color pattern",
 		.flags = SET_IMMEDIATELY,
 	},
 
 	// WIA2:
 	{
-		.opt_name = "pages", .cb = set_int,
+		.opt_name = "pages",
+		.cb = set_int,
 		.cb_data = &g_numbers[0], /* 0 = infinite */
 		.flags = SET_IMMEDIATELY,
 	},
 
 	// TWAIN:
 	{
-		.opt_name = "transfer_count", .cb = set_int,
+		.opt_name = "transfer_count",
+		.cb = set_int,
 		.cb_data = &g_numbers[2], /* -1 */
 		.flags = SET_IMMEDIATELY,
 	},
 	{
-		.opt_name = "compression", .cb = set_str,
+		.opt_name = "compression",
+		.cb = set_str,
 		.cb_data = "none",
 		.flags = SET_IMMEDIATELY,
 	},
 	{
-		.opt_name = "transfer_mechanism", .cb = set_str,
+		.opt_name = "transfer_mechanism",
+		.cb = set_str,
 		.cb_data = "native",
 		.flags = SET_IMMEDIATELY,
 	},
 	{
-		.opt_name = "image_file_format", .cb = set_str,
+		.opt_name = "image_file_format",
+		.cb = set_str,
 		.cb_data = "bmp",
 		.flags = SET_IMMEDIATELY,
 	},
 	{
-		.opt_name = "bit_depth", .cb = set_int,
+		.opt_name = "bit_depth",
+		.cb = set_int,
 		.cb_data = &g_numbers[4], /* 24 */
 		.flags = SET_IMMEDIATELY,
 	},
 	{
-		.opt_name = "indicators", .cb = set_boolean,
+		.opt_name = "indicators",
+		.cb = set_boolean,
 		.cb_data = NULL, /* FALSE */
 		.flags = SET_IMMEDIATELY,
 	},
 	{
-		.opt_name = "supported_sizes", .cb = set_str,
+		.opt_name = "supported_sizes",
+		.cb = set_str,
 		.cb_data = "none",
 		.flags = SET_IMMEDIATELY,
 	},
@@ -210,7 +240,7 @@ static enum lis_error set_to_limit(struct lis_option_descriptor *opt, void *cb_d
 	} else {
 		// Sane + Epson Perfection 1250
 		// https://gitlab.gnome.org/World/OpenPaperwork/libinsane/issues/17
-		// https://openpaper.work/en-us/scanner_db/report/328/
+		// https://openpaper.work/en/scanner_db/report/328/
 		if (opt->value.type == LIS_TYPE_INTEGER) {
 			lis_log_info("Current value of option '%s' = %d", opt->name, value.integer);
 			if (data->minmax > 0) {

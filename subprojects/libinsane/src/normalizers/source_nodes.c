@@ -308,7 +308,7 @@ static enum lis_error set_source(struct lis_sn_item_private *private)
 		if (!LIS_OPT_IS_READABLE(opts[source_opt_idx])
 				|| !LIS_OPT_IS_WRITABLE(opts[source_opt_idx])) {
 			// XXX(Jflesch): Sane + Canon LiDE 220 (genesys)
-			// https://openpaper.work/en-us/scanner_db/report/318/
+			// https://openpaper.work/en/scanner_db/report/318/
 			// We have 2 possible sources, the option is SW_SELECT,
 			// but inactive, so we can't select any ...
 			lis_log_warning(

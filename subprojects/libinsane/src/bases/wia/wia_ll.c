@@ -327,7 +327,7 @@ static enum lis_error get_device_descriptor(
 
 	// ASSUMPTION(Jflesch): only the property 'dev_name' seems to be
 	// reliable to get the manufacturer name and model name.
-	// See: https://openpaper.work/fr/scanner_db/report/337/
+	// See: https://openpaper.work/en/scanner_db/report/337/
 	// --> we assume the first word in dev_name is the manufacturer
 	// and the rest is the model name, unless there is only one word
 	// in dev_name.
