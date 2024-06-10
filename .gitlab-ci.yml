@@ -1,7 +1,6 @@
 image: debian:bullseye
 
 stages:
-  - build
   - test
   # Do not run Linux and Windows tests at the same time. Test rigs share some scanners
   # and both systems cannot access a scanner at the same time.
@@ -49,9 +48,6 @@ stages:
 
 check:
   stage: test
-  only:
-    - branches@World/OpenPaperwork/libinsane
-    - tags@World/OpenPaperwork/libinsane
   <<: *apt
   script:
     - apt-get install -y -qq sparse clang-tidy-11
@@ -59,9 +55,6 @@ check:
 
 test:
   stage: test
-  only:
-    - branches@World/OpenPaperwork/libinsane
-    - tags@World/OpenPaperwork/libinsane
   <<: *apt
   script:
     - make test
