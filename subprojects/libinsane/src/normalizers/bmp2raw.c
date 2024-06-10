@@ -512,7 +512,7 @@ static enum lis_error read_bmp_header(struct lis_bmp2raw_scan_session *private)
 		private->line.packed.useful + private->line.packed.padding,
 		private->line.unpacked.useful
 	);
-	private->line.content = calloc(sizeof(uint8_t), i);
+	private->line.content = calloc(i, sizeof(uint8_t));
 	if (private->line.content == NULL) {
 		return LIS_ERR_NO_MEM;
 	}
