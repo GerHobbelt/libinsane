@@ -118,7 +118,7 @@ test_hw_linux:
   script:
     # Keep in mind this one is a real system --> you're not root on it
     # --> no APT commands here
-    - . ./activate_test_env.sh && make test_hw
+    - . ./activate_test_env.sh && make && make test_hw
   artifacts:
     paths:
       - test_hw_out
@@ -135,7 +135,7 @@ test_hw_macos:
   # This one is real system, and the gitlab-runner is running as a non-admin,
   # so it cannot run brew.
   script:
-    - . ./activate_test_env.sh && make test_hw
+    - . ./activate_test_env.sh && make && make test_hw
 
 test_hw_windows:
   stage: test_hw_windows
