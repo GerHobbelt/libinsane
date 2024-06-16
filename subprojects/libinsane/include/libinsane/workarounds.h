@@ -137,7 +137,7 @@ extern enum lis_error lis_api_workaround_hide_source_auto(
 );
 
 
-#ifdef OS_LINUX
+#if defined(OS_LINUX)
 /*!
  * \brief Access scanners through a dedicated process.
  *
@@ -154,6 +154,9 @@ extern enum lis_error lis_api_workaround_hide_source_auto(
  *
  * WIA2 already has a dedicated process and therefore this workaround is not
  * required.
+ *
+ * Note: lis_api_workaround_dedicated_thread() is used instead on MacOS
+ * because fork() is too limited on MacOS.
  */
 extern enum lis_error lis_api_workaround_dedicated_process(
 	struct lis_api *to_wrap, struct lis_api **out_impl

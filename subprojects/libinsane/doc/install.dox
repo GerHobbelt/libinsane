@@ -100,6 +100,26 @@ source ./activate_test_env.sh
 ```
 
 
+### Macos
+
+Requires Homebrew.
+
+```
+brew install \
+    cunit \
+    doxygen \
+    graphviz \
+    gtk-doc \
+    meson \
+    plantuml \
+    pygobject3 gobject-introspection \
+    sane-backends \
+    vala
+```
+
+Other than that, GNU/Linux instructions apply.
+
+
 ### Windows (Msys2)
 
 2018/10/16: Your user name must not contain any spaces or build will fail.
