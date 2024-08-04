@@ -11,7 +11,7 @@
 #include <libinsane/util.h>
 #include <libinsane/workarounds.h>
 
-#ifdef OS_LINUX
+#if defined(OS_LINUX) || defined(OS_MACOS)
 #include <libinsane/sane.h>
 #endif
 
@@ -161,7 +161,7 @@ static const struct {
 		.wrap_cb = lis_api_normalizer_all_opts_on_all_sources,
 		.enabled_by_default = 1,
 	},
-#ifdef OS_LINUX
+#if defined(OS_LINUX)
 	{	// dedicated process wrapper ensure thread-safety and therefore
 		// should be loaded last
 		.name = "workaround_dedicated_process",
@@ -174,10 +174,10 @@ static const struct {
 		.name = "workaround_dedicated_thread",
 		.env = "LIBINSANE_WORKAROUND_DEDICATED_THREAD",
 		.wrap_cb = lis_api_workaround_dedicated_thread,
-#ifdef OS_LINUX
-		.enabled_by_default = 0,
-#else
+#if defined(OS_WINDOWS)
 		.enabled_by_default = 1,
+#else
+		.enabled_by_default = 0,
 #endif
 	},
 };
@@ -196,7 +196,7 @@ enum lis_error lis_safebet(struct lis_api **out_impls)
 
 	lis_log_info("Initializing base implementations ...");
 
-#ifdef OS_LINUX
+#if defined(OS_LINUX) || defined(OS_MACOS)
 	if (lis_getenv("LIBINSANE_SANE", 1)) {
 		err = lis_api_sane(&impls[nb_impls]);
 		if (LIS_IS_ERROR(err)) {
@@ -248,8 +248,10 @@ enum lis_error lis_safebet(struct lis_api **out_impls)
 		if (env) {
 			err = g_implementations[i].wrap_cb(*out_impls, &next);
 			if (LIS_IS_ERROR(err)) {
-				lis_log_error("Failed to initialize '%s'",
-						g_implementations[i].name);
+				lis_log_error(
+					"Failed to initialize '%s'",
+					g_implementations[i].name
+				);
 				goto error;
 			}
 			*out_impls = next;

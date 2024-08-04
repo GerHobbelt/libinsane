@@ -30,6 +30,29 @@ export GI_TYPELIB_PATH=/usr/local/lib/x86_64-linux-gnu/girepository-1.0
 ```
 
 
+#### Python Virtualenvs
+
+In a virtualenv, you are going to need the Python bindings for GObject
+Introspection. Pillow may be handy to process scanned images too.
+
+```
+virtualenv venv
+source venv/bin/activate
+pip install PyGObject
+pip install Pillow
+```
+
+Another option is to let your virtualenv access the libraries on your host
+system and install pygobject with your favorite package manager
+(`python3-gi` in Debian and Ubuntu).
+
+```
+sudo apt install python3-gi python3-pil
+virtualenv --system-site-packages venv
+source venv/bin/activate
+```
+
+
 #### Importing
 
 When using Python, you can import any GObject Introspection using the following:

@@ -1,11 +1,11 @@
 image: debian:bullseye
 
 stages:
-  - build
   - test
-  # Do not run Linux and Windows tests at the same time. Test rigs share some scanners
-  # and both systems cannot access a scanner at the same time.
+  # Do not run Linux, macOS and Windows tests at the same time. Test rigs share
+  # some scanners and both systems cannot access a same scanner at the same time.
   - test_hw_linux
+  - test_hw_macos
   - test_hw_windows
   - deploy
 
@@ -49,22 +49,46 @@ stages:
 
 check:
   stage: test
-  only:
-    - branches@World/OpenPaperwork/libinsane
-    - tags@World/OpenPaperwork/libinsane
   <<: *apt
   script:
     - apt-get install -y -qq sparse clang-tidy-11
     - make check
 
-test:
+test_linux:
+  stage: test
+  <<: *apt
+  script:
+    - make test
+
+test_macos:
   stage: test
   only:
     - branches@World/OpenPaperwork/libinsane
     - tags@World/OpenPaperwork/libinsane
-  <<: *apt
+  tags:
+    - macos
+  # This one is a real system too and the user used by gitlab-runner
+  # has no admin right --> can't run brew.
   script:
     - make test
+
+test_windows:
+  stage: test
+  only:
+    - branches@World/OpenPaperwork/libinsane
+    - tags@World/OpenPaperwork/libinsane
+  variables:
+    MSYSTEM: "MINGW64"
+    CHERE_INVOKING: "yes"
+  tags:
+    - windows
+  # This one is a real system too, but it's a Windows, so nobody cares.
+  # Dependencies should already be installed, but still it's simpler and safer
+  # to ask pacman to install them anyway.
+  <<: *msys64
+  script:
+    - c:\msys64\usr\bin\bash -lc "make install PREFIX=/mingw64"
+    - c:\msys64\usr\bin\bash -lc "make test"
 
 
 doc:
@@ -94,12 +118,24 @@ test_hw_linux:
   script:
     # Keep in mind this one is a real system --> you're not root on it
     # --> no APT commands here
-    - . ./activate_test_env.sh && make test_hw
+    - . ./activate_test_env.sh && make && make test_hw
   artifacts:
     paths:
       - test_hw_out
     expire_in: 2 days
 
+test_hw_macos:
+  stage: test_hw_macos
+  only:
+    - branches@World/OpenPaperwork/libinsane
+    - tags@World/OpenPaperwork/libinsane
+  tags:
+    - macos
+    - testhw
+  # This one is real system, and the gitlab-runner is running as a non-admin,
+  # so it cannot run brew.
+  script:
+    - . ./activate_test_env.sh && make && make test_hw
 
 test_hw_windows:
   stage: test_hw_windows

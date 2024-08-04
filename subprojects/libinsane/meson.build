@@ -10,6 +10,13 @@ if host_machine.system() == 'windows'
         '-DCOMPILER_GCC',
         language: 'c'
     )
+elif host_machine.system() == 'darwin'
+    message('Target OS: Apple macOS')
+    add_project_arguments(
+        '-DOS_MACOS',
+        '-DCOMPILER_GCC',
+        language: 'c'
+    )
 else
     message('Target OS: Unix-like')
     add_project_arguments(

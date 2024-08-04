@@ -56,6 +56,16 @@ if host_machine.system() == 'windows'
     # Bug with Mingw32 + gcc 7.3.0:
     # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=52991
     extra_cflags += ['-mno-ms-bitfields']
+
+elif host_machine.system() == 'macos'
+    libinsane_srcs += [
+        'bases/sane.c',
+    ]
+    deps += [dependency('sane-backends')]
+    # Older versions of Meson only allow strings (Debian stretch for instance)
+    pkg_deps = ['-pthreads', '-lsane']
+    pkg_cflags = ['-pthreads']
+
 else
     libinsane_srcs += [
         'bases/sane.c',

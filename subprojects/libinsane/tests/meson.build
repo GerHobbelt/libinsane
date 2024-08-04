@@ -33,7 +33,7 @@ LIBINSANE_VALGRIND_TESTS = [
     'workaround_opt_values',
 ]
 
-if host_machine.system() == build_machine.system() and build_machine.system() != 'windows' and build_machine.system() != 'cygwin'
+if host_machine.system() == build_machine.system() and build_machine.system() == 'linux'
     LIBINSANE_VALGRIND_TESTS += [
         'workaround_dedicated_process',
         'workaround_dedicated_process_pack',
@@ -52,7 +52,7 @@ if CUNIT.found()
 
     vg = find_program('valgrind', required: false)
 
-    if host_machine.system() != build_machine.system() or build_machine.system() == 'windows' or build_machine.system() == 'cygwin' or not vg.found()
+    if host_machine.system() != build_machine.system() or build_machine.system() != 'linux'
 
         warning('Tests: Valgrind won\'t be used. Can\'t look for memory leaks.')
 
