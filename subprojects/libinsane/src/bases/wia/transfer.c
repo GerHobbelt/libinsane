@@ -1397,7 +1397,7 @@ enum lis_error wia_transfer_new(
 	 * https://www.openpaper.work/fr/scanner_db/report/640/
 	 */
 	EnterCriticalSection(&self->scan.critical_section);
-	while (self->scan.written <= BMP_HEADER_SIZE &&
+	while ((long long unsigned int)self->scan.written <= BMP_HEADER_SIZE &&
 			(self->current.msg == NULL || self->current.msg->type != WIA_MSG_END_OF_FEED)) {
 		lis_log_info("Waiting for data (got %lu B for now) ...", self->scan.written);
 		SleepConditionVariableCS(
