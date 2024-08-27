@@ -5,8 +5,8 @@ stages:
   # Do not run Linux, macOS and Windows tests at the same time. Test rigs share
   # some scanners and both systems cannot access a same scanner at the same time.
   - test_hw_linux
-  - test_hw_macos
   - test_hw_windows
+  - test_hw_macos
   - deploy
 
 .apt: &apt
