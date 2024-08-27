@@ -1079,7 +1079,11 @@ static HRESULT WINAPI wia_stream_seek(
 				plibNewPosition->QuadPart = dlibMove.QuadPart;
 				return S_OK;
 			}
-			break;
+			/* Canon TR4600: accept weird seeks anyway and pray for it to work
+			 * anyway
+			 */
+			plibNewPosition->QuadPart = dlibMove.QuadPart;
+			return S_OK;
 		case STREAM_SEEK_CUR:
 		case STREAM_SEEK_END:
 			if (dlibMove.QuadPart == 0) {
