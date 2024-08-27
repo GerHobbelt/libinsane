@@ -48,6 +48,7 @@ struct wia_transfer {
 	struct lis_scan_session scan_session;
 
 	int refcount;
+	int need_mirroring;
 
 	IStream istream;
 	LisIWiaAppErrorHandler app_error_handler;
@@ -609,6 +610,13 @@ static enum lis_error get_scan_parameters(
 		(long)parameters->image_size
 	);
 
+	if (!self->need_mirroring) {
+		/* HACK(Jflesch): reverse the height, so bmp2raw
+		 * does not mirror left<->right the lines
+		 */
+		parameters->height *= -1;
+	}
+
 	err = LIS_OK;
 end:
 	for (i = 0 ; i < LIS_COUNT_OF(output) ; i++) {
@@ -1083,6 +1091,7 @@ static HRESULT WINAPI wia_stream_seek(
 			 * anyway
 			 */
 			plibNewPosition->QuadPart = dlibMove.QuadPart;
+			self->need_mirroring = 0;
 			return S_OK;
 		case STREAM_SEEK_CUR:
 		case STREAM_SEEK_END:
@@ -1111,11 +1120,8 @@ static HRESULT WINAPI wia_stream_set_size(
 	)
 {
 	LIS_UNUSED(_self);
-	lis_log_error(
-		"IStream->SetSize(%lu): Unsupported operation",
-		(long)libNewSize.QuadPart
-	);
-	return E_NOTIMPL;
+	lis_log_warning("IStream->SetSize(%lu)", (long)libNewSize.QuadPart);
+	return S_OK;
 }
 
 
@@ -1349,6 +1355,7 @@ enum lis_error wia_transfer_new(
 	// The structure wia_transfer actually contains 3 objects:
 	// IStream, IWiaAppErrorHandler and IWiaTransferCallback
 	self->refcount = 3;
+	self->need_mirroring = 1;
 
 	self->wia_item = in_wia_item;
 	self->wia_item->lpVtbl->AddRef(self->wia_item);
@@ -1382,6 +1389,24 @@ enum lis_error wia_transfer_new(
 		err = LIS_ERR_INTERNAL_UNKNOWN_ERROR;
 		goto err;
 	}
+
+	/* Wait for the actual data, otherwise scan parameters may be wrong:
+	 * a seek at the end of the file means we are getting data
+	 * top to bottom instead of bottom to top.
+	 * Culprit: Canon TR4600
+	 * https://www.openpaper.work/fr/scanner_db/report/640/
+	 */
+	EnterCriticalSection(&self->scan.critical_section);
+	while (self->scan.written <= BMP_HEADER_SIZE &&
+			(self->current.msg == NULL || self->current.msg->type != WIA_MSG_END_OF_FEED)) {
+		lis_log_info("Waiting for data (got %lu B for now) ...", self->scan.written);
+		SleepConditionVariableCS(
+			&self->scan.condition_variable,
+			&self->scan.critical_section,
+			10000 /* ms */
+		);
+	}
+	LeaveCriticalSection(&self->scan.critical_section);
 
 	*out_transfer = self;
 	return LIS_OK;
