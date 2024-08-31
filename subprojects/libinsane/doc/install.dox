@@ -143,13 +143,13 @@ If you plan on compiling your program as a 64bits executable:
 ```
 pacman -S \
         make \
-        mingw-w64-x86_64-cunit \
-        mingw-w64-x86_64-doxygen \
-        mingw-w64-x86_64-gcc \
-        mingw-w64-x86_64-gobject-introspection \
-        mingw-w64-x86_64-meson \
-        mingw-w64-x86_64-python3-gobject \
-        mingw-w64-x86_64-vala
+        mingw-w64-ucrt-x86_64-cunit \
+        mingw-w64-ucrt-x86_64-doxygen \
+        mingw-w64-ucrt-x86_64-gcc \
+        mingw-w64-ucrt-x86_64-gobject-introspection \
+        mingw-w64-ucrt-x86_64-meson \
+        mingw-w64-ucrt-x86_64-python3-gobject \
+        mingw-w64-ucrt-x86_64-vala
 ```
 
 If you plan on compiling your program as a 32bits executable, you just
@@ -166,21 +166,21 @@ cd libinsane
 # make will call meson. The first thing meson will do is to generate the ninja
 # build files. Those files include the value of 'PREFIX'. So even if you don't
 # install Libinsane at this step, you must already specify the PREFIX path.
-# Replace '/mingw64' by '/mingw32' below if you want to build 32 bits binaries.
-make PREFIX=/mingw64
-make test PREFIX=/mingw64 # optional
+# Replace '/ucrt64' by '/mingw32' below if you want to build 32 bits binaries.
+make PREFIX=/ucrt64
+make test PREFIX=/ucrt64 # optional
 ```
 
 
 #### Installation
 
 Depending whether you intend to build a 32bits executable for your application
-or a 64bits executable, you will have to install Libinsane in either `/mingw64`
+or a 64bits executable, you will have to install Libinsane in either `/ucrt64`
 or `/mingw32`:
 
 ```
-# Replace '/mingw64' by '/mingw32' below if you want to build 32 bits binaries
-make install PREFIX=/mingw64
+# Replace '/ucrt64' by '/mingw32' below if you want to build 32 bits binaries
+make install PREFIX=/ucrt64
 ```
 
 
