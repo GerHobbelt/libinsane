@@ -1080,8 +1080,10 @@ static HRESULT WINAPI wia_stream_seek(
 				return S_OK;
 			}
 			break;
+		case STREAM_SEEK_CUR:
 		case STREAM_SEEK_END:
 			if (dlibMove.QuadPart == 0) {
+				/* STREAM_SEEK_CUR: Canon TR4600 */
 				plibNewPosition->QuadPart = self->scan.written;
 				return S_OK;
 			}
