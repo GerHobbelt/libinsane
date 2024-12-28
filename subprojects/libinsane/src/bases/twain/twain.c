@@ -23,7 +23,7 @@
 
 #define ENABLE_TWAIN2 TRUE
 
-#define MAX_ID_LENGTH 64 // is manufacturer name + model. TWAIN limits both to 32
+#define MAX_ID_LENGTH 128 // is manufacturer name + model. TWAIN limits both to 32
 #define MAX_MSG 16
 
 
