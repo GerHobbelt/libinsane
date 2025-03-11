@@ -522,7 +522,7 @@ static enum lis_error lis_sane_item_get_scan_parameters(
 		" format=%d, height=%d, width=%d, bytes_per_line=%d, depth=%d",
 		private->item->parent.name,
 		p.format, p.lines, p.pixels_per_line, p.bytes_per_line, p.depth
-	)
+	);
 	out_p->width = p.pixels_per_line;
 	out_p->height = p.lines;
 	out_p->image_size = p.bytes_per_line * p.lines;
