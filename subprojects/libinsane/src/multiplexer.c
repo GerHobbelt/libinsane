@@ -252,7 +252,7 @@ static enum lis_error lis_multi_get_device(struct lis_api *impl, const char *dev
 {
 	struct lis_multi *private = LIS_MULTI_PRIVATE(impl);
 	char *api_name;
-	char *sep;
+	const char *sep;
 	int i;
 
 	sep = strchr(dev_id, ':');
