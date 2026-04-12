@@ -31,8 +31,8 @@ stages:
     - c:\msys64\usr\bin\pacman --needed --noconfirm -S mingw-w64-ucrt-x86_64-gcc
     - c:\msys64\usr\bin\pacman --needed --noconfirm -S mingw-w64-ucrt-x86_64-gobject-introspection
     - c:\msys64\usr\bin\pacman --needed --noconfirm -S mingw-w64-ucrt-x86_64-meson
-    - c:\msys64\usr\bin\pacman --needed --noconfirm -S mingw-w64-ucrt-x86_64-python3-gobject
-    - c:\msys64\usr\bin\pacman --needed --noconfirm -S mingw-w64-ucrt-x86_64-python3-pillow
+    - c:\msys64\usr\bin\pacman --needed --noconfirm -S mingw-w64-ucrt-x86_64-python-gobject
+    - c:\msys64\usr\bin\pacman --needed --noconfirm -S mingw-w64-ucrt-x86_64-python-pillow
     - c:\msys64\usr\bin\pacman --needed --noconfirm -S mingw-w64-ucrt-x86_64-vala
 
 .msys64: &msys64
@@ -43,8 +43,8 @@ stages:
     - c:\msys64\usr\bin\pacman --needed --noconfirm -S mingw-w64-ucrt-x86_64-gcc
     - c:\msys64\usr\bin\pacman --needed --noconfirm -S mingw-w64-ucrt-x86_64-gobject-introspection
     - c:\msys64\usr\bin\pacman --needed --noconfirm -S mingw-w64-ucrt-x86_64-meson
-    - c:\msys64\usr\bin\pacman --needed --noconfirm -S mingw-w64-ucrt-x86_64-python3-gobject
-    - c:\msys64\usr\bin\pacman --needed --noconfirm -S mingw-w64-ucrt-x86_64-python3-pillow
+    - c:\msys64\usr\bin\pacman --needed --noconfirm -S mingw-w64-ucrt-x86_64-python-gobject
+    - c:\msys64\usr\bin\pacman --needed --noconfirm -S mingw-w64-ucrt-x86_64-python-pillow
     - c:\msys64\usr\bin\pacman --needed --noconfirm -S mingw-w64-ucrt-x86_64-vala
 
 check:
