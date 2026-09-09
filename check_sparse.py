@@ -40,7 +40,9 @@ if __name__ == "__main__":
         cflags += ['-D_Float64x=double']
         cflags += ['-D_Float128=double']
         cflags += ['-D_Float128x=double']
+        cflags += ['-D__access__(...)=']
         cflags += ['-D__ARM_PCS_VFP']
+        cflags += ['-Wno-default-bitfield-sign']
         print("Running sparse on {}".format(filepath))
         cmd = ['sparse', filepath] + cflags
         r = subprocess.run(cmd)
