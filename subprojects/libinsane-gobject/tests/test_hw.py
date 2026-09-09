@@ -181,7 +181,7 @@ def main():
                 # set the options
                 set_opt(src, 'resolution', [150, 200, 300])
                 if t == 2:
-                    set_opt(src, 'mode', ['LineArt'])
+                    set_opt(src, 'mode', ['Gray'])
                 else:
                     set_opt(src, 'mode', ['Color'])
 
