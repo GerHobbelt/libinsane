@@ -50,7 +50,7 @@ check:
   stage: test
   <<: *apt
   script:
-    - apt-get install -y -qq sparse clang-tidy-11
+    - apt-get install -y -qq sparse
     - make check
 
 test_linux:
