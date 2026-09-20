@@ -95,9 +95,10 @@ else
 endif
 
 if host_machine.system() == 'windows'
+    wia_inc = include_directories('bases/wia/wia_include')
     libinsane = library(
         'insane', libinsane_srcs, version_h,
-        include_directories: libinsane_inc,
+        include_directories: [libinsane_inc, wia_inc],
         dependencies: deps,
         install: true,
         c_args: extra_cflags,

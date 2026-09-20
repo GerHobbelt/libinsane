@@ -14,6 +14,7 @@ free to package them separately.
 
 ```
 sudo apt install \
+        cmake \
         make \
         meson \
         gtk-doc-tools doxygen plantuml graphviz \
@@ -33,6 +34,7 @@ sudo apt install sparse clang-tidy-11
 
 ```
 sudo dnf install \
+        cmake \
         make \
         meson \
         gtk-doc \
@@ -148,7 +150,7 @@ pacman -S \
         mingw-w64-ucrt-x86_64-gcc \
         mingw-w64-ucrt-x86_64-gobject-introspection \
         mingw-w64-ucrt-x86_64-meson \
-        mingw-w64-ucrt-x86_64-python3-gobject \
+        mingw-w64-ucrt-x86_64-python-gobject \
         mingw-w64-ucrt-x86_64-vala
 ```
 
