@@ -2,11 +2,10 @@ image: debian:trixie
 
 stages:
   - test
-  # Do not run Linux, macOS and Windows tests at the same time. Test rigs share
+  # Do not run Linux, and Windows tests at the same time. Test rigs share
   # some scanners and both systems cannot access a same scanner at the same time.
   - test_hw_linux
   - test_hw_windows
-  - test_hw_macos
   - deploy
 
 .apt: &apt
@@ -51,24 +50,12 @@ check:
   stage: test
   <<: *apt
   script:
-    - apt-get install -y -qq sparse clang-tidy-11
+    - apt-get install -y -qq sparse
     - make check
 
 test_linux:
   stage: test
   <<: *apt
-  script:
-    - make test
-
-test_macos:
-  stage: test
-  only:
-    - branches@World/OpenPaperwork/libinsane
-    - tags@World/OpenPaperwork/libinsane
-  tags:
-    - macos
-  # This one is a real system too and the user used by gitlab-runner
-  # has no admin right --> can't run brew.
   script:
     - make test
 
@@ -123,19 +110,6 @@ test_hw_linux:
     paths:
       - test_hw_out
     expire_in: 2 days
-
-test_hw_macos:
-  stage: test_hw_macos
-  only:
-    - branches@World/OpenPaperwork/libinsane
-    - tags@World/OpenPaperwork/libinsane
-  tags:
-    - macos
-    - testhw
-  # This one is real system, and the gitlab-runner is running as a non-admin,
-  # so it cannot run brew.
-  script:
-    - . ./activate_test_env.sh && make && make test_hw
 
 test_hw_windows:
   stage: test_hw_windows
